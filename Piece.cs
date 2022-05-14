@@ -9,17 +9,19 @@ namespace DominoPlayer
     public class Piece
     {
         private int[] numbers;
-        public Piece(int number1, int number2)
+        public Piece(params int[] numbers)
         {
-            numbers = new int[2];
-            numbers[0] = number1;
-            numbers[1] = number2;
+            this.numbers = numbers;
         }
         public void Reverse()
         {
-            int temp = numbers[0];
-            numbers[0] = numbers[1];
-            numbers[1] = temp;
+            int mid = numbers.Length / 2;
+            for (int i = 0; i < mid; i++)
+            {
+                int temp = numbers[i];
+                numbers[i] = numbers[numbers.Length - i - 1];
+                numbers[numbers.Length - 1 - i] = temp;
+            }
         }
         public int this[int i]
         {

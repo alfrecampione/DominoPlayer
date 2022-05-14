@@ -15,7 +15,7 @@ namespace DominoPlayer
         }
         List<Piece> board;
         List<Piece> undistributedPieces;
-        
+
         int piecesPerHand;
         public Board(int numberOfPlayers, int piecesPerHand, int maxValue)
         {
@@ -36,7 +36,7 @@ namespace DominoPlayer
                 }
             }
         }
-            
+
         List<Piece> CreateHand()
         {
             Random random = new Random();
