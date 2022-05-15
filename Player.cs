@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DominoPlayer
 {
-    class Player
+    public class Player
     {
         List<Piece> hand;
         Board board;
