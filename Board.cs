@@ -48,7 +48,7 @@ namespace DominoPlayer
             }
         }
 
-        List<Piece> CreateHand()
+        public List<Piece> CreateHand()
         {
             Random random = new Random();
             List<Piece> hand = new();
