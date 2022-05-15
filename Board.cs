@@ -15,25 +15,36 @@ namespace DominoPlayer
         }
         List<Piece> board;
         List<Piece> undistributedPieces;
-
+        int numberOfParts;
         int piecesPerHand;
-        public Board(int numberOfPlayers, int piecesPerHand, int maxValue)
+        public Board(int numberOfPlayers, int piecesPerHand, int maxValue, int numberOfParts)
         {
             this.undistributedPieces = new List<Piece>();
             this.board = new List<Piece>();
             this.actualTurn = 1;
             this.piecesPerHand = piecesPerHand;
-            CreateAllPieces(maxValue);
+            this.numberOfParts = numberOfParts;
+            int[] capacity = new int[numberOfParts];
+            CreateAllPieces(maxValue, 0, capacity);
         }
-
-        void CreateAllPieces(int maxValue)
+        void CreateAllPieces(int maxValue, int numberOfPart, int[] values)
         {
+            if (numberOfPart == values.Length - 1)
+            {
+                Piece p = new(values);
+                bool found = false;
+                for (int i = 0; i < undistributedPieces.Count; i++)
+                {
+                    if (undistributedPieces[i] == p)
+                        found = true;
+                }
+                if (!found)
+                    undistributedPieces.Add(p);
+            }
             for (int i = 0; i <= maxValue; i++)
             {
-                for (int j = i; j <= maxValue; j++)
-                {
-                    undistributedPieces.Add(new(i, j));
-                }
+                values[numberOfParts] = i;
+                CreateAllPieces(maxValue, numberOfParts + 1, values);
             }
         }
 

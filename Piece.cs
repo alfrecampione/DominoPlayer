@@ -27,5 +27,39 @@ namespace DominoPlayer
         {
             get { return numbers[i]; }
         }
+        public static bool operator ==(Piece a, Piece b)
+        {
+            Dictionary<int, int> aDict = new();
+            Dictionary<int, int> bDict = new();
+            for (int i = 0; i < a.numbers.Length; i++)
+            {
+                try
+                {
+                    aDict[a[i]]++;
+                }
+                catch (KeyNotFoundException)
+                {
+                    aDict.Add(a[i], 1);
+                }
+                try
+                {
+                    aDict[b[i]]++;
+                }
+                catch (KeyNotFoundException)
+                {
+                    aDict.Add(b[i], 1);
+                }
+            }
+            for (int i = 0; i < aDict.Count; i++)
+            {
+                if (aDict.Keys.ToArray()[i] != bDict.Keys.ToArray()[i] || aDict[aDict.Keys.ToArray()[i]] != bDict[bDict.Keys.ToArray()[i]])
+                    return false;
+            }
+            return true;
+        }
+        public static bool operator !=(Piece a, Piece b)
+        {
+            return !(a == b);
+        }
     }
 }
