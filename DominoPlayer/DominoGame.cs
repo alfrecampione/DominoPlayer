@@ -18,6 +18,7 @@ public class DominoGame
     readonly List<Piece> gamePieces;
     readonly List<Piece> undistributedPieces;
     readonly int piecesPerHand;
+
     public DominoGame(int numberOfPlayers, int piecesPerHand, int maxValue)
     {
         this.players = new Player[numberOfPlayers];
@@ -52,5 +53,10 @@ public class DominoGame
             undistributedPieces.RemoveAt(index);
         }
         return hand;
+    }
+
+    public Piece GetPieceOnExtreme(bool right)
+    {
+        return gamePieces[right ? ^1 : 0];
     }
 }

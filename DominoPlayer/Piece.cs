@@ -23,6 +23,12 @@ namespace DominoPlayer
                 numbers[numbers.Length - 1 - i] = temp;
             }
         }
+        public bool CanMatch(Piece other, bool right)
+        {
+            int extremeIndex = right ? 1 : 0;
+
+            return other[0] == this[extremeIndex] || other[1] == this[extremeIndex];
+        }
         public int this[int i]
         {
             get { return numbers[i]; }
