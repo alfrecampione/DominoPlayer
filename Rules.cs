@@ -95,12 +95,14 @@
                 }
             }
         }
-        static void PointForSameNumber(Dictionary<int, List<int>> hand, ref double[,] result)
+        static void PointForSameNumber(Dictionary<int, List<int>> dict, ref double[,] result)
         {
-            for (int i = 0; i < length; i++)
+            int[] keys = new int[dict.Count];
+            for (int i = 0; i < keys.Length; i++)
             {
-
+                keys[i] = dict[i].Count;
             }
+
         }
     }
 }
