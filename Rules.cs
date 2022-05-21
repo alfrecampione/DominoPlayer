@@ -2,14 +2,12 @@
 {
     static class Rules
     {
-        //si puede jugar +1.0
-        const double canPlay = 1.0;
-        //si el quipo no lleva +0.15
+        //si el quipo no lleva +teamMissing
         const double teamMissing = 0.15;
-        //si el contrario no lleva +0.25
+        //si el contrario no lleva +opponentMissing
         const double opponentMissing = 0.25;
-        //data (n*0.20)/t   n=tamaño de la data    t= cantidad de fichas en la mano
-        const double sameNumber = 0.20;
+        //data (n*sameNumber)/t   n=tamaño de la data    t= cantidad de fichas en la mano
+        const double sameNumber = 0.50;
         public static double[,] GetValues(List<Piece> hand, Board board, List<List<double>> missingTeamNumbers, List<List<double>> missingOpponentNumbers)
         {
             Dictionary<int, List<int>> dict = new();
@@ -59,6 +57,7 @@
             double[,] result = new double[2, newHand.Count];
             PointsForTeamMate(hand, missingTeamNumbers, ref result);
             PointsForOponnent(hand, missingOpponentNumbers, ref result);
+            PointForSameNumber(dict, hand, ref result);
             return result;
         }
         static void PointsForTeamMate(List<Piece> hand, List<List<double>> missingTeamNumbers, ref double[,] result)
@@ -95,14 +94,21 @@
                 }
             }
         }
-        static void PointForSameNumber(Dictionary<int, List<int>> dict, ref double[,] result)
+        static void PointForSameNumber(Dictionary<int, List<int>> dict, List<Piece> hand, ref double[,] result)
         {
             int[] keys = new int[dict.Count];
+            List<int> numbers = dict.Keys.ToList();
             for (int i = 0; i < keys.Length; i++)
             {
                 keys[i] = dict[i].Count;
             }
-
+            for (int i = 0; i < result.GetLength(1); i++)
+            {
+                if (dict[hand[i][0]].Count != 1)
+                {
+                    result[0, i] += (sameNumber * keys[numbers.IndexOf(hand[i][0])]) / hand.Count;
+                }
+            }
         }
     }
 }

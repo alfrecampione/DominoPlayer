@@ -5,6 +5,8 @@ VisualStudioVersion = 17.1.32421.90
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DominoPlayer", "DominoPlayer.csproj", "{81689703-091F-4C95-8115-69697BE1DF3D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DominoTester", "..\DominoTester\DominoTester.csproj", "{A778D734-4491-4D92-9B14-4D45E51E444C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{81689703-091F-4C95-8115-69697BE1DF3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{81689703-091F-4C95-8115-69697BE1DF3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{81689703-091F-4C95-8115-69697BE1DF3D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A778D734-4491-4D92-9B14-4D45E51E444C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A778D734-4491-4D92-9B14-4D45E51E444C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A778D734-4491-4D92-9B14-4D45E51E444C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A778D734-4491-4D92-9B14-4D45E51E444C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
