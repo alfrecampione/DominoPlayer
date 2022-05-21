@@ -1,31 +1,28 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.1.32421.90
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DominoPlayer", "DominoPlayer.csproj", "{81689703-091F-4C95-8115-69697BE1DF3D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DominoPlayerTester", "DominoPlayerTester\DominoPlayerTester.csproj", "{9E57F2D7-1C8C-4AF3-9E16-485EC84BE8BF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DominoTester", "..\DominoTester\DominoTester.csproj", "{A778D734-4491-4D92-9B14-4D45E51E444C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DominoPlayer", "DominoPlayer\DominoPlayer.csproj", "{32013A82-8A8F-48E1-BEBF-D2D20ACDE9FC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
-	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{81689703-091F-4C95-8115-69697BE1DF3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{81689703-091F-4C95-8115-69697BE1DF3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{81689703-091F-4C95-8115-69697BE1DF3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{81689703-091F-4C95-8115-69697BE1DF3D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A778D734-4491-4D92-9B14-4D45E51E444C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A778D734-4491-4D92-9B14-4D45E51E444C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A778D734-4491-4D92-9B14-4D45E51E444C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A778D734-4491-4D92-9B14-4D45E51E444C}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {D1DE3708-BC81-4EDA-8CB7-828DBC046290}
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9E57F2D7-1C8C-4AF3-9E16-485EC84BE8BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E57F2D7-1C8C-4AF3-9E16-485EC84BE8BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E57F2D7-1C8C-4AF3-9E16-485EC84BE8BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E57F2D7-1C8C-4AF3-9E16-485EC84BE8BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{32013A82-8A8F-48E1-BEBF-D2D20ACDE9FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{32013A82-8A8F-48E1-BEBF-D2D20ACDE9FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{32013A82-8A8F-48E1-BEBF-D2D20ACDE9FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{32013A82-8A8F-48E1-BEBF-D2D20ACDE9FC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

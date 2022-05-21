@@ -1,4 +1,7 @@
-﻿namespace DominoPlayer;
+﻿using System.Collections.Generic;
+using System;
+
+namespace DominoPlayer;
 
 public class DominoGame
 {
