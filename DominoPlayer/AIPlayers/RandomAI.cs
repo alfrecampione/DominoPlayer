@@ -1,4 +1,4 @@
-namespace DominoPlayer;
+namespace DominoPlayer.AI;
 
 public class RandomAI : Player
 {
