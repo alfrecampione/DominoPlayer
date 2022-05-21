@@ -13,6 +13,10 @@ namespace DominoPlayer
         {
             get { return actualTurn; }
         }
+        public int Count
+        {
+            get { return board.Count; } 
+        }
         List<Piece> board;
         List<Piece> undistributedPieces;
         int numberOfParts;
@@ -47,7 +51,6 @@ namespace DominoPlayer
                 CreateAllPieces(maxValue, numberOfParts + 1, values);
             }
         }
-
         public List<Piece> CreateHand()
         {
             Random random = new Random();
@@ -59,6 +62,11 @@ namespace DominoPlayer
                 undistributedPieces.RemoveAt(index);
             }
             return hand;
+        }
+
+        public Piece this[int i]
+        {
+            get { return board[i]; }
         }
     }
 }
