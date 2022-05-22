@@ -19,34 +19,78 @@ public class SmartAI : Player
                 gameReference.GetPieceOnExtreme(true)
             );
 
+        //I only need if it can be played, not need for what side, it will checked after
         var possiblePieces = from piece in hand
                              where leftPiece.CanMatch(piece, false) || rightPiece.CanMatch(piece, true)
-                             select (piece, rightPiece.CanMatch(piece, true));
+                             select piece;
 
-        int[,] pieceValues = new int[2, possiblePieces.Count()];
+        var smartPieces = possiblePieces.ToList();
+
+        int[][] pieceValues = new int[possiblePieces.Count()][];
+        for (int i = 0; i < possiblePieces.Count(); i++)
+        {
+            pieceValues[i] = new int[2];
+        }
 
         //------------------------
         //Assigning values
-        //
+        //(Alfredo: I will do it)
+        //The highest value in a piece will be the prefered side to join with the piece on board
         //Finish assigning
         //------------------------
 
-        int index = 0;
-        int value = 0;
-        for (int i = 0; i < pieceValues.GetLength(1); i++)
+
+        List<int> sortedValues = new();
+        for (int i = 0; i < possiblePieces.Count(); i++)
         {
-            if (pieceValues[0, i] > value)
+            sortedValues.AddRange(pieceValues[i]);
+        }
+
+        //Any way to make this prettier?
+        sortedValues.Sort();
+        sortedValues.Reverse();
+        //------------------------
+
+        Piece pieceToPlay = new();
+        bool placedOnRight = default;
+
+        //Check the side to put the piece with the highest side value
+        for (int i = 0; i < sortedValues.Count; i++)
+        {
+            for (int j = 0; j < pieceValues.Length; j++)
             {
-                value = pieceValues[0, i];
-                index = i;
-            }
-            if (pieceValues[1, i] > value)
-            {
-                value = pieceValues[1, i];
-                index = i;
+                if (sortedValues[i] == pieceValues[j][0])
+                {
+                    if (smartPieces[j][0] == leftPiece[0])
+                    {
+                        pieceToPlay = smartPieces[j];
+                        placedOnRight = false;
+                        break;
+                    }
+                    if (smartPieces[j][0] == rightPiece[1])
+                    {
+                        pieceToPlay = smartPieces[j];
+                        placedOnRight = true;
+                        break;
+                    }
+                }
+                if (sortedValues[i] == pieceValues[j][1])
+                {
+                    if (smartPieces[j][1] == leftPiece[0])
+                    {
+                        pieceToPlay = smartPieces[j];
+                        placedOnRight = false;
+                        break;
+                    }
+                    if (smartPieces[j][1] == rightPiece[1])
+                    {
+                        pieceToPlay = smartPieces[j];
+                        placedOnRight = true;
+                        break;
+                    }
+                }
             }
         }
-        var smartPieces = possiblePieces.ToArray();
-        return new Move(playerID, smartPieces[index].Item1, false, rightPiece.CanMatch(smartPieces[index].Item1, true));
+        return new Move(playerID, pieceToPlay, false, placedOnRight);
     }
 }
