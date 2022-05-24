@@ -33,6 +33,19 @@ namespace DominoPlayer
         {
             get { return numbers[i]; }
         }
+        public override bool Equals(object? obj)
+        {
+            if (obj is null || obj.GetType().BaseType != typeof(Piece))
+                return base.Equals(obj);
+
+            Piece p = (Piece)obj;
+
+            return this == p;
+        }
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
         public static bool operator ==(Piece a, Piece b)
         {
             Dictionary<int, int> aDict = new();

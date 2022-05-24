@@ -1,22 +1,32 @@
 namespace DominoPlayer.AI;
 
-public class SmartAI : Player
+public class SmartAI : IDominoPlayer
 {
+    public int PlayerID { get; set; }
+    private List<Piece>? hand;
+    public DominoGame GameReference { get; set; }
     List<List<int>> valuesPartnerNotHave;
     List<List<int>> valuesOpponentNothave;
-    public SmartAI(int playerID, List<Piece> startingHand, DominoGame game, List<List<int>> valuesPartnerNotHave, List<List<int>> valuesOpponentNothave) :
-        base(playerID, startingHand, game)
+
+    public SmartAI(int playerID, DominoGame game, List<List<int>> valuesPartnerNotHave, List<List<int>> valuesOpponentNothave)
     {
+        this.PlayerID = playerID;
+        this.GameReference = game;
         this.valuesPartnerNotHave = valuesPartnerNotHave;
         this.valuesOpponentNothave = valuesOpponentNothave;
     }
 
-    public override Move GetMove()
+    public void StartGame(List<Piece> startingHand)
+    {
+        hand = new(startingHand);
+    }
+    public List<Piece> GetCurrentHand() => hand ?? throw new DominoException("Game not started");
+    public Move GetMove()
     {
         (Piece leftPiece, Piece rightPiece) =
             (
-                gameReference.GetPieceOnExtreme(false),
-                gameReference.GetPieceOnExtreme(true)
+                GameReference.GetPieceOnExtreme(false),
+                GameReference.GetPieceOnExtreme(true)
             );
 
         //I only need if it can be played, not need for what side, it will checked after
@@ -91,6 +101,6 @@ public class SmartAI : Player
                 }
             }
         }
-        return new Move(playerID, pieceToPlay, false, placedOnRight);
+        return new Move(PlayerID, pieceToPlay, false, placedOnRight);
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Linq;
+using System.Collections.Generic;
 using System;
 
 namespace DominoPlayer;
@@ -14,22 +15,18 @@ public class DominoGame
         get { return gamePieces[i]; }
     }
 
-    readonly Player[] players;
+    IDominoPlayer[]? players;
     readonly List<Piece> gamePieces;
     readonly List<Piece> undistributedPieces;
     readonly int piecesPerHand;
-
-    public DominoGame(int numberOfPlayers, int piecesPerHand, int maxValue)
+    public int CurrentPlayer { get; private set; }
+    public DominoGame(int piecesPerHand, int maxValue)
     {
-        this.players = new Player[numberOfPlayers];
         this.undistributedPieces = new List<Piece>();
         this.gamePieces = new List<Piece>();
         this.piecesPerHand = piecesPerHand;
 
         CreateAllPieces(maxValue);
-
-        if (numberOfPlayers * piecesPerHand > undistributedPieces.Count)
-            throw new ArgumentOutOfRangeException(nameof(numberOfPlayers), "Too many players.");
     }
     void CreateAllPieces(int maxValue)
     {
@@ -37,8 +34,84 @@ public class DominoGame
             for (int e = i; e <= maxValue; e++)
                 this.undistributedPieces.Add(new Piece(i, e));
     }
+    public void StartGame(IDominoPlayer[] players)
+    {
+        // TODO: Safe coding
+        this.players = (IDominoPlayer[])players.Clone();
+        foreach (var player in this.players)
+            player.StartGame(CreateHand());
 
-    public List<Piece> CreateHand()
+        CurrentPlayer = new Random().Next(players.Length);
+    }
+    public bool IsGameOver(out int winner)
+    {
+        //TODO: Many things.
+        foreach (var player in players ?? throw new DominoException("Game not started."))
+            if (player.GetCurrentHand().Count == 0)
+            {
+                winner = player.PlayerID;
+                return true;
+            }
+
+        bool foundAny = false;
+        foreach (var player in players)
+            if (HasPlayablePieces(player.GetCurrentHand()))
+            {
+                foundAny = true;
+                break;
+            }
+
+        if (!foundAny)
+        {
+            
+        }
+
+        winner = -1;
+        return false;
+    }
+    public bool HasPlayablePieces(IEnumerable<Piece> hand)
+    {
+        (Piece leftPiece, Piece rightPiece) =
+            (
+                GetPieceOnExtreme(false),
+                GetPieceOnExtreme(true)
+            );
+
+        return hand.Any(p => leftPiece.CanMatch(p, false) || rightPiece.CanMatch(p, true));
+    }
+    public IEnumerable<(Piece piece, bool right)> GetPlayablePieces(IEnumerable<Piece> hand)
+    {
+        (Piece leftPiece, Piece rightPiece) =
+            (
+                GetPieceOnExtreme(false),
+                GetPieceOnExtreme(true)
+            );
+        return from piece in hand
+               where leftPiece.CanMatch(piece, false) || rightPiece.CanMatch(piece, true)
+               select (piece, rightPiece.CanMatch(piece, true));
+    }
+    public void MakeMove(Move move)
+    {
+        if (move.passed)
+            return;
+
+        if (move.placedOnRight)
+            gamePieces.Add(move.piecePlaced);
+        else
+            gamePieces.Insert(0, move.piecePlaced);
+    }
+    public void NextTurn()
+    {
+        // TODO: Safe coding
+        if (players is null)
+            throw new DominoException("Game not started");
+
+        MakeMove(players[CurrentPlayer].GetMove());
+        CurrentPlayer++;
+        if (CurrentPlayer >= players.Length)
+            CurrentPlayer = 0;
+    }
+    List<Piece> CreateHand()
     {
         Random random = new();
         List<Piece> hand = new();
