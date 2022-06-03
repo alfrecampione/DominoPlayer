@@ -21,6 +21,7 @@ public class Program
             }
         }
     }
+    const int TURNS_PAUSE = 500;
     static void PlayDomino()
     {
         DominoGame game = new(10, 6);
@@ -32,7 +33,9 @@ public class Program
 
         while (true)
         {
+            game.NextTurn();
 
+            Thread.Sleep(TURNS_PAUSE);
         }
     }
     static string AskForInput(
