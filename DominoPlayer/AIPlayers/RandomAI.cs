@@ -2,16 +2,20 @@ namespace DominoPlayer.AI;
 
 public class RandomAI : DominoPlayer
 {
+    private readonly Random generator;
+
     public RandomAI(int playerID, DominoGame game)
-    : base(playerID, game) { }
+    : base(playerID, game)
+    {
+        generator = new Random();
+    }
 
     public override Move GetMove()
     {
-        var possiblePieces = GameReference.GetPlayablePieces(Hand ?? throw new DominoException("Game not started"));
+        var possiblePieces = GameReference.GetPlayablePieces(Hand);
 
-        Random rnd = new();
-        int index = rnd.Next(possiblePieces.Count());
-        var randomPieces = possiblePieces.ToArray();
-        return new Move(PlayerID, randomPieces[index].piece, false, randomPieces[index].right);
+        var (piece, right) = possiblePieces.ElementAt(generator.Next(possiblePieces.Count()));
+
+        return new Move(PlayerID, piece, false, right);
     }
 }

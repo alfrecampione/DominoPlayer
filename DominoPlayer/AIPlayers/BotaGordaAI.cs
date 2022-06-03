@@ -7,7 +7,7 @@ public class BotaGordaAI : DominoPlayer
 
     public override Move GetMove()
     {
-        var possiblePieces = GameReference.GetPlayablePieces(Hand ?? throw new DominoException("Game not started"));
+        var possiblePieces = GameReference.GetPlayablePieces(Hand);
 
         (Piece piece, bool right) = possiblePieces.MaxBy(p => p.piece[0] + p.piece[1]);
 
