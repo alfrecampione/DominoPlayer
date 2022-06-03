@@ -3,8 +3,8 @@ namespace DominoPlayer;
 public abstract class DominoPlayer
 {
     public int PlayerID { get; }
-    private DominoGame GameReference { get; }
-    private List<Piece> Hand { get; set; }
+    protected DominoGame GameReference { get; }
+    protected List<Piece> Hand { get; set; }
 
     public DominoPlayer(int playerID, DominoGame game)
     {
