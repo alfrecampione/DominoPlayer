@@ -15,7 +15,7 @@ public class DominoGame
         get { return gamePieces[i]; }
     }
 
-    IDominoPlayer[]? players;
+    DominoPlayer[]? players;
     readonly List<Piece> gamePieces;
     readonly List<Piece> undistributedPieces;
     readonly int piecesPerHand;
@@ -34,10 +34,10 @@ public class DominoGame
             for (int e = i; e <= maxValue; e++)
                 this.undistributedPieces.Add(new Piece(i, e));
     }
-    public void StartGame(IDominoPlayer[] players)
+    public void StartGame(DominoPlayer[] players)
     {
         // TODO: Safe coding
-        this.players = (IDominoPlayer[])players.Clone();
+        this.players = (DominoPlayer[])players.Clone();
         foreach (var player in this.players)
             player.StartGame(CreateHand());
 

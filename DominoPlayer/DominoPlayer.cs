@@ -6,9 +6,9 @@ public abstract class DominoPlayer
     protected DominoGame GameReference { get; }
     protected List<Piece> Hand { get; set; }
 
-    public DominoPlayer(int PlayerID, DominoGame game)
+    public DominoPlayer(int playerID, DominoGame game)
     {
-        this.PlayerID = PlayerID;
+        this.PlayerID = playerID;
         this.GameReference = game;
         this.Hand = new();
     }
