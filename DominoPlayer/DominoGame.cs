@@ -63,22 +63,14 @@ public class DominoGame
 
         if (!foundAny)
         {
-            
+
         }
 
         winner = -1;
         return false;
     }
-    public bool HasPlayablePieces(IEnumerable<Piece> hand)
-    {
-        (Piece leftPiece, Piece rightPiece) =
-            (
-                GetPieceOnExtreme(false),
-                GetPieceOnExtreme(true)
-            );
+    public bool HasPlayablePieces(IEnumerable<Piece> hand) => (GetPlayablePieces(hand).Count() == 0) ? true : false;
 
-        return hand.Any(p => leftPiece.CanMatch(p, false) || rightPiece.CanMatch(p, true));
-    }
     public IEnumerable<(Piece piece, bool right)> GetPlayablePieces(IEnumerable<Piece> hand)
     {
         (Piece leftPiece, Piece rightPiece) =
