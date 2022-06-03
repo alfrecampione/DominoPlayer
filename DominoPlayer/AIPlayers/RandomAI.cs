@@ -1,26 +1,13 @@
 namespace DominoPlayer.AI;
 
-public class RandomAI : IDominoPlayer
+public class RandomAI : DominoPlayer
 {
-    public int PlayerID { get; set; }
-    public List<Piece>? hand;
-    public DominoGame GameReference { get; set; }
+    public RandomAI(int playerID, DominoGame game)
+    : base(playerID, game) { }
 
-    public RandomAI(int PlayerID, DominoGame game)
+    public override Move GetMove()
     {
-        this.PlayerID = PlayerID;
-        this.GameReference = game;
-    }
-
-    public void StartGame(List<Piece> startingHand)
-    {
-        hand = new(startingHand);
-    }
-    public List<Piece> GetCurrentHand() => hand ?? throw new DominoException("Game not started");
-
-    public Move GetMove()
-    {
-        var possiblePieces = GameReference.GetPlayablePieces(hand ?? throw new DominoException("Game not started"));
+        var possiblePieces = GameReference.GetPlayablePieces(Hand ?? throw new DominoException("Game not started"));
 
         Random rnd = new();
         int index = rnd.Next(possiblePieces.Count());

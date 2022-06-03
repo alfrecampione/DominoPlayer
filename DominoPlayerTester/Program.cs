@@ -24,14 +24,15 @@ public class Program
     static void PlayDomino()
     {
         DominoGame game = new(10, 6);
-        game.StartGame(new IDominoPlayer[]
+        game.StartGame(new DominoPlayer[]
         {
             new RandomAI(0, game),
             new BotaGordaAI(1, game)
         });
 
-        while(true){
-            
+        while (true)
+        {
+
         }
     }
     static string AskForInput(

@@ -46,30 +46,10 @@ public class DominoGame
     public bool IsGameOver(out int winner)
     {
         //TODO: Many things.
-        foreach (var player in players ?? throw new DominoException("Game not started."))
-            if (player.GetCurrentHand().Count == 0)
-            {
-                winner = player.PlayerID;
-                return true;
-            }
-
-        bool foundAny = false;
-        foreach (var player in players)
-            if (HasPlayablePieces(player.GetCurrentHand()))
-            {
-                foundAny = true;
-                break;
-            }
-
-        if (!foundAny)
-        {
-
-        }
-
-        winner = -1;
+        winner = 0;
         return false;
     }
-    public bool HasPlayablePieces(IEnumerable<Piece> hand) => (GetPlayablePieces(hand).Count() == 0) ? true : false;
+    public bool HasPlayablePieces(IEnumerable<Piece> hand) => (GetPlayablePieces(hand).Count() == 0);
 
     public IEnumerable<(Piece piece, bool right)> GetPlayablePieces(IEnumerable<Piece> hand)
     {

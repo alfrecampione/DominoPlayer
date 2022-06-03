@@ -2,7 +2,6 @@ namespace DominoPlayer.AI;
 
 public class SmartAI : DominoPlayer
 {
-    private List<Piece>? hand;
     List<List<double>> valuesPartnerNotHave;
     List<List<double>> valuesOpponentNothave;
     const double teamMissing = 0.15;
@@ -16,11 +15,6 @@ public class SmartAI : DominoPlayer
         this.valuesOpponentNothave = valuesOpponentNothave;
     }
 
-    public override void StartGame(List<Piece> startingHand)
-    {
-        hand = new(startingHand);
-    }
-    public List<Piece> GetCurrentHand() => hand ?? throw new DominoException("Game not started");
     public override Move GetMove()
     {
         (Piece leftPiece, Piece rightPiece) =
@@ -30,7 +24,7 @@ public class SmartAI : DominoPlayer
             );
 
         //I only need if it can be played, not need for what side, it will checked after
-        var possiblePieces = from piece in hand
+        var possiblePieces = from piece in Hand
                              where leftPiece.CanMatch(piece, false) || rightPiece.CanMatch(piece, true)
                              select piece;
 
@@ -107,42 +101,42 @@ public class SmartAI : DominoPlayer
         return new Move(PlayerID, pieceToPlay, false, placedOnRight);
     }
 
-    static void PointsForTeamMate(List<Piece> hand, List<List<double>> valuesPartnerNotHave, double[][] pieceValues)
+    static void PointsForTeamMate(List<Piece> Hand, List<List<double>> valuesPartnerNotHave, double[][] pieceValues)
     {
         for (int i = 0; i < valuesPartnerNotHave.Count; i++)
         {
             for (int j = 0; j < valuesPartnerNotHave[i].Count; j++)
             {
-                for (int k = 0; k < hand.Count; k++)
+                for (int k = 0; k < Hand.Count; k++)
                 {
-                    if (hand[k][0] == valuesPartnerNotHave[i][j])
+                    if (Hand[k][0] == valuesPartnerNotHave[i][j])
                         pieceValues[0][k] += teamMissing;
-                    if (hand[k][1] == valuesPartnerNotHave[i][j])
+                    if (Hand[k][1] == valuesPartnerNotHave[i][j])
                         pieceValues[1][k] += teamMissing;
                 }
             }
         }
     }
-    static void PointsForOponnent(List<Piece> hand, List<List<double>> valuesOpponentNothave, double[][] pieceValues)
+    static void PointsForOponnent(List<Piece> Hand, List<List<double>> valuesOpponentNothave, double[][] pieceValues)
     {
         for (int i = 0; i < valuesOpponentNothave.Count; i++)
         {
             for (int j = 0; j < valuesOpponentNothave[i].Count; j++)
             {
-                for (int k = 0; k < hand.Count; k++)
+                for (int k = 0; k < Hand.Count; k++)
                 {
-                    if (hand[k][0] == valuesOpponentNothave[i][j])
+                    if (Hand[k][0] == valuesOpponentNothave[i][j])
                         pieceValues[1][k] += opponentMissing;
-                    if (hand[k][1] == valuesOpponentNothave[i][j])
+                    if (Hand[k][1] == valuesOpponentNothave[i][j])
                         pieceValues[0][k] += opponentMissing;
                 }
             }
         }
     }
-    static void PointForSameNumber(List<Piece> hand, double[][] pieceValues)
+    static void PointForSameNumber(List<Piece> Hand, double[][] pieceValues)
     {
         Dictionary<double, int> dict = new();
-        foreach (var piece in hand)
+        foreach (var piece in Hand)
         {
             try
             {
@@ -165,10 +159,10 @@ public class SmartAI : DominoPlayer
         for (int i = 0; i < pieceValues.GetLength(1); i++)
         {
             int up = 1;
-            int index = keys.IndexOf(hand[i][0]);
+            int index = keys.IndexOf(Hand[i][0]);
             if (index == -1)
             {
-                index = keys.IndexOf(hand[i][1]);
+                index = keys.IndexOf(Hand[i][1]);
                 up = 0;
             }
             pieceValues[index][up] += dict[keys[i]] * sameNumber;
