@@ -1,30 +1,27 @@
 namespace DominoPlayer.AI;
 
-public class SmartAI : IDominoPlayer
+public class SmartAI : DominoPlayer
 {
-    public int PlayerID { get; set; }
     private List<Piece>? hand;
-    public DominoGame GameReference { get; set; }
     List<List<double>> valuesPartnerNotHave;
     List<List<double>> valuesOpponentNothave;
     const double teamMissing = 0.15;
     const double opponentMissing = 0.25;
     const double sameNumber = 0.50;
 
-    public SmartAI(int playerID, DominoGame game, List<List<double>> valuesPartnerNotHave, List<List<double>> valuesOpponentNothave)
+    public SmartAI(int playerID, DominoGame game, List<List<double>> valuesPartnerNotHave, List<List<double>> valuesOpponentNothave) :
+    base(playerID, game)
     {
-        this.PlayerID = playerID;
-        this.GameReference = game;
         this.valuesPartnerNotHave = valuesPartnerNotHave;
         this.valuesOpponentNothave = valuesOpponentNothave;
     }
 
-    public void StartGame(List<Piece> startingHand)
+    public override void StartGame(List<Piece> startingHand)
     {
         hand = new(startingHand);
     }
     public List<Piece> GetCurrentHand() => hand ?? throw new DominoException("Game not started");
-    public Move GetMove()
+    public override Move GetMove()
     {
         (Piece leftPiece, Piece rightPiece) =
             (
