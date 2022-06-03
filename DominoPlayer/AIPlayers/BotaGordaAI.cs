@@ -1,28 +1,16 @@
 namespace DominoPlayer.AI;
 
-public class BotaGordaAI : IDominoPlayer
+public class BotaGordaAI : DominoPlayer
 {
-    public int PlayerID { get; set; }
-    public List<Piece>? hand;
-    public DominoGame GameReference { get; set; }
-
     public BotaGordaAI(int playerID, DominoGame game)
-    {
-        this.PlayerID = playerID;
-        this.GameReference = game;
-    }
+    : base(playerID, game) { }
 
-    public void StartGame(List<Piece> startingHand)
+    public override Move GetMove()
     {
-        hand = new(startingHand);
-    }
-    public List<Piece> GetCurrentHand() => hand ?? throw new DominoException("Game not started");
-    public Move GetMove()
-    {
-        var possiblePieces = GameReference.GetPlayablePieces(hand ?? throw new DominoException("Game not started"));
+        var possiblePieces = GameReference.GetPlayablePieces(Hand ?? throw new DominoException("Game not started"));
 
-        (Piece piece, bool right) gordastPiece = possiblePieces.MaxBy(p => p.piece[0] + p.piece[1]);
+        (Piece piece, bool right) = possiblePieces.MaxBy(p => p.piece[0] + p.piece[1]);
 
-        return new Move(this.PlayerID, gordastPiece.piece, false, gordastPiece.right);
+        return new Move(this.PlayerID, piece, false, right);
     }
 }
