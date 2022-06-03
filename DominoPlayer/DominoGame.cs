@@ -20,6 +20,9 @@ public class DominoGame
     readonly List<Piece> undistributedPieces;
     readonly int piecesPerHand;
     public int CurrentPlayer { get; private set; }
+
+    public event Action<Move>? OnMoveMade;
+
     public DominoGame(int piecesPerHand, int maxValue)
     {
         this.undistributedPieces = new List<Piece>();
@@ -36,8 +39,7 @@ public class DominoGame
     }
     public void StartGame(DominoPlayer[] players)
     {
-        // TODO: Safe coding
-        this.players = (DominoPlayer[])players.Clone();
+        this.players = players;
         foreach (var player in this.players)
             player.StartGame(CreateHand());
 
@@ -49,7 +51,6 @@ public class DominoGame
         winner = 0;
         return false;
     }
-    public bool HasPlayablePieces(IEnumerable<Piece> hand) => (GetPlayablePieces(hand).Count() == 0);
 
     public IEnumerable<(Piece piece, bool right)> GetPlayablePieces(IEnumerable<Piece> hand)
     {
@@ -64,22 +65,22 @@ public class DominoGame
     }
     public void MakeMove(Move move)
     {
-        if (move.passed)
-            return;
+        if (!move.passed)
+            if (move.placedOnRight)
+                gamePieces.Add(move.piecePlaced);
+            else
+                gamePieces.Insert(0, move.piecePlaced);
 
-        if (move.placedOnRight)
-            gamePieces.Add(move.piecePlaced);
-        else
-            gamePieces.Insert(0, move.piecePlaced);
+        OnMoveMade?.Invoke(move);
     }
     public void NextTurn()
     {
-        // TODO: Safe coding
         if (players is null)
             throw new DominoException("Game not started");
 
         MakeMove(players[CurrentPlayer].GetMove());
         CurrentPlayer++;
+
         if (CurrentPlayer >= players.Length)
             CurrentPlayer = 0;
     }
