@@ -6,33 +6,44 @@ using System.Threading.Tasks;
 
 namespace DominoPlayer
 {
-    public class Piece
+    public struct Piece
     {
-        private int[] numbers;
-        public Piece(params int[] numbers)
+        private readonly int sideA;
+        private readonly int sideB;
+        private bool reversed;
+        public Piece(int valueA, int valueB)
         {
-            this.numbers = numbers;
+            this.sideA = valueA;
+            this.sideB = valueB;
+            this.reversed = false;
         }
         public void Reverse()
         {
-            int mid = numbers.Length / 2;
-            for (int i = 0; i < mid; i++)
+            reversed = !reversed;
+        }
+        public bool CanMatch(Piece other, bool right, out bool reversed)
+        {
+            var compare = (Piece a, Piece b) =>
+            (right ? a.GetRight() : a.GetLeft()) == (right ? other.GetLeft() : other.GetRight());
+
+            bool nonReversedComparison = compare(this, other);
+
+            if (nonReversedComparison)
             {
-                int temp = numbers[i];
-                numbers[i] = numbers[numbers.Length - i - 1];
-                numbers[numbers.Length - 1 - i] = temp;
+                reversed = false;
+                return true;
+            }
+            else
+            {
+                reversed = true;
+                other.Reverse();
+
+                return compare(this, other);
             }
         }
-        public bool CanMatch(Piece other, bool right)
-        {
-            int extremeIndex = right ? 1 : 0;
+        public int GetLeft() => reversed ? sideB : sideA;
+        public int GetRight() => reversed ? sideA : sideB;
 
-            return other[0] == this[extremeIndex] || other[1] == this[extremeIndex];
-        }
-        public int this[int i]
-        {
-            get { return numbers[i]; }
-        }
         public override bool Equals(object? obj)
         {
             if (obj is null || obj.GetType().BaseType != typeof(Piece))
@@ -48,33 +59,17 @@ namespace DominoPlayer
         }
         public static bool operator ==(Piece a, Piece b)
         {
-            Dictionary<int, int> aDict = new();
-            Dictionary<int, int> bDict = new();
-            for (int i = 0; i < a.numbers.Length; i++)
+            var eq = (Piece l, Piece r) => l.GetLeft() == r.GetLeft() && l.GetRight() == r.GetRight();
+
+            bool initialComparison = eq(a, b);
+
+            if (initialComparison)
+                return true;
+            else
             {
-                try
-                {
-                    aDict[a[i]]++;
-                }
-                catch (KeyNotFoundException)
-                {
-                    aDict.Add(a[i], 1);
-                }
-                try
-                {
-                    aDict[b[i]]++;
-                }
-                catch (KeyNotFoundException)
-                {
-                    aDict.Add(b[i], 1);
-                }
+                a.Reverse();
+                return eq(a, b);
             }
-            for (int i = 0; i < aDict.Count; i++)
-            {
-                if (aDict.Keys.ToArray()[i] != bDict.Keys.ToArray()[i] || aDict[aDict.Keys.ToArray()[i]] != bDict[bDict.Keys.ToArray()[i]])
-                    return false;
-            }
-            return true;
         }
         public static bool operator !=(Piece a, Piece b)
         {
