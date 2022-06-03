@@ -1,6 +1,6 @@
 namespace DominoPlayer.AI;
 
-public class BotaGordaAI : IDominoPlayer
+public class BotaGordaAI : DominoPlayer
 {
     public int PlayerID { get; set; }
     public List<Piece>? hand;
