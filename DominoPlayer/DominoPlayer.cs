@@ -15,7 +15,6 @@ public abstract class DominoPlayer
 
     public abstract Move GetMove();
     public virtual int PiecesInHand() => Hand.Count;
-    public virtual bool HasPlayablePieces() => GameReference.HasPlayablePieces(Hand);
     public virtual void StartGame(List<Piece> startingHand)
     {
         Hand.Clear();
