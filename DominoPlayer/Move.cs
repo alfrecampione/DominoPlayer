@@ -14,4 +14,7 @@ public struct Move
         this.passed = passed;
         this.placedOnRight = placedOnRight;
     }
+
+    public static Move CreateMove(int playerID, Piece piece, bool right) => new(playerID, piece, false, right);
+    public static Move CreatePass(int playerID) => new(playerID, default, true, default);
 }
