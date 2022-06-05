@@ -29,10 +29,6 @@ public class DominoGame
         this.gamePieces = new List<Piece>();
         this.piecesPerHand = piecesPerHand;
 
-        CreateAllPieces(maxValue);
-    }
-    void CreateAllPieces(int maxValue)
-    {
         for (int i = 0; i <= maxValue; i++)
             for (int e = i; e <= maxValue; e++)
                 this.undistributedPieces.Add(new Piece(i, e));
