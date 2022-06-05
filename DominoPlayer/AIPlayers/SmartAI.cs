@@ -24,9 +24,7 @@ public class SmartAI : DominoPlayer
             );
 
         //I only need if it can be played, not need for what side, it will checked after
-        var possiblePieces = from piece in Hand
-                             where leftPiece.CanMatch(piece, false) || rightPiece.CanMatch(piece, true)
-                             select piece;
+        var possiblePieces = GameReference.GetPlayablePieces(Hand).Select(p => p.piece);
 
         var smartPieces = possiblePieces.ToList();
 
@@ -68,13 +66,13 @@ public class SmartAI : DominoPlayer
             {
                 if (sortedValues[i] == pieceValues[j][0])
                 {
-                    if (smartPieces[j][0] == leftPiece.GetLeft())
+                    if (smartPieces[j].Left == leftPiece.Left)
                     {
                         pieceToPlay = smartPieces[j];
                         placedOnRight = false;
                         break;
                     }
-                    if (smartPieces[j][0] == leftPiece.GetRight())
+                    if (smartPieces[j].Left == leftPiece.Right)
                     {
                         pieceToPlay = smartPieces[j];
                         placedOnRight = true;
@@ -83,13 +81,13 @@ public class SmartAI : DominoPlayer
                 }
                 if (sortedValues[i] == pieceValues[j][1])
                 {
-                    if (smartPieces[j][1] == leftPiece.GetLeft())
+                    if (smartPieces[j].Right == leftPiece.Left)
                     {
                         pieceToPlay = smartPieces[j];
                         placedOnRight = false;
                         break;
                     }
-                    if (smartPieces[j][1] == leftPiece.GetRight())
+                    if (smartPieces[j].Right == leftPiece.Right)
                     {
                         pieceToPlay = smartPieces[j];
                         placedOnRight = true;
@@ -109,9 +107,9 @@ public class SmartAI : DominoPlayer
             {
                 for (int k = 0; k < Hand.Count; k++)
                 {
-                    if (Hand[k].GetLeft() == valuesPartnerNotHave[i][j])
+                    if (Hand[k].Left == valuesPartnerNotHave[i][j])
                         pieceValues[0][k] += teamMissing;
-                    if (Hand[k].GetRight() == valuesPartnerNotHave[i][j])
+                    if (Hand[k].Right == valuesPartnerNotHave[i][j])
                         pieceValues[1][k] += teamMissing;
                 }
             }
@@ -125,9 +123,9 @@ public class SmartAI : DominoPlayer
             {
                 for (int k = 0; k < Hand.Count; k++)
                 {
-                    if (Hand[k].GetLeft() == valuesOpponentNothave[i][j])
+                    if (Hand[k].Left == valuesOpponentNothave[i][j])
                         pieceValues[1][k] += opponentMissing;
-                    if (Hand[k].GetRight() == valuesOpponentNothave[i][j])
+                    if (Hand[k].Right == valuesOpponentNothave[i][j])
                         pieceValues[0][k] += opponentMissing;
                 }
             }
@@ -140,29 +138,29 @@ public class SmartAI : DominoPlayer
         {
             try
             {
-                dict[piece.GetLeft()] += 1;
+                dict[piece.Left] += 1;
             }
             catch
             {
-                dict.Add(piece.GetLeft(), 1);
+                dict.Add(piece.Left, 1);
             }
             try
             {
-                dict[piece.GetRight()] += 1;
+                dict[piece.Right] += 1;
             }
             catch
             {
-                dict.Add(piece.GetRight(), 1);
+                dict.Add(piece.Right, 1);
             }
         }
         var keys = dict.Keys.ToList();
         for (int i = 0; i < pieceValues.GetLength(1); i++)
         {
             int up = 1;
-            int index = keys.IndexOf(Hand[i].GetLeft());
+            int index = keys.IndexOf(Hand[i].Left);
             if (index == -1)
             {
-                index = keys.IndexOf(Hand[i].GetRight());
+                index = keys.IndexOf(Hand[i].Right);
                 up = 0;
             }
             pieceValues[index][up] += dict[keys[i]] * sameNumber;
