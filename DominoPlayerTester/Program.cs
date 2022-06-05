@@ -22,9 +22,13 @@ public class Program
         }
     }
     const int TURNS_PAUSE = 500;
+    static DominoGame? game;
     static void PlayDomino()
     {
-        DominoGame game = new(10, 6);
+        game = new(10, 6);
+
+        game.OnMoveMade += OnDominoMove;
+
         game.StartGame(new DominoPlayer[]
         {
             new RandomAI(0, game),
@@ -36,8 +40,58 @@ public class Program
             game.NextTurn();
 
             Thread.Sleep(TURNS_PAUSE);
+
+            if (game.IsGameOver(out int winner))
+            {
+                DominoGameOver(winner);
+                return;
+            }
         }
     }
+    static void DominoGameOver(int winner)
+    {
+
+    }
+    static readonly List<Piece> dominoBoard = new();
+    static void OnDominoMove(Move move)
+    {
+        if (!move.passed)
+            if (move.placedOnRight)
+                dominoBoard.Add(move.piecePlaced);
+            else
+                dominoBoard.Insert(0, move.piecePlaced);
+
+        RepaintDominoBoard();
+    }
+    static void RepaintDominoBoard()
+    {
+        Console.Clear();
+        Console.WriteLine($@"Players: {2}
+            Current Player: {game?.CurrentPlayer}");
+
+        Console.WriteLine();
+
+        foreach (var piece in dominoBoard)
+        {
+            Console.Write(PaintPiece(piece));
+        }
+    }
+    static string PaintPiece(Piece piece)
+        => $"[{NumberToEmoji(piece.GetLeft())}|{NumberToEmoji(piece.GetRight())}]";
+    static string NumberToEmoji(int num) => num switch
+    {
+        0 => "0️⃣",
+        1 => "1️⃣",
+        2 => "2️⃣",
+        3 => "3️⃣",
+        4 => "4️⃣",
+        5 => "5️⃣",
+        6 => "6️⃣",
+        7 => "7️⃣",
+        8 => "8️⃣",
+        9 => "9️⃣",
+        _ => ""
+    };
     static string AskForInput(
         string message,
         bool writeLine = true,
