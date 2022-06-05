@@ -9,7 +9,7 @@ public class BotaGordaAI : DominoPlayer
     {
         var possiblePieces = GameReference.GetPlayablePieces(Hand);
 
-        (Piece piece, bool right) = possiblePieces.MaxBy(p => p.piece[0] + p.piece[1]);
+        (Piece piece, bool right) = possiblePieces.MaxBy(p => p.piece.GetLeft() + p.piece.GetRight());
 
         return new Move(this.PlayerID, piece, false, right);
     }

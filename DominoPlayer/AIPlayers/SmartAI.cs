@@ -68,13 +68,13 @@ public class SmartAI : DominoPlayer
             {
                 if (sortedValues[i] == pieceValues[j][0])
                 {
-                    if (smartPieces[j][0] == leftPiece[0])
+                    if (smartPieces[j][0] == leftPiece.GetLeft())
                     {
                         pieceToPlay = smartPieces[j];
                         placedOnRight = false;
                         break;
                     }
-                    if (smartPieces[j][0] == rightPiece[1])
+                    if (smartPieces[j][0] == leftPiece.GetRight())
                     {
                         pieceToPlay = smartPieces[j];
                         placedOnRight = true;
@@ -83,13 +83,13 @@ public class SmartAI : DominoPlayer
                 }
                 if (sortedValues[i] == pieceValues[j][1])
                 {
-                    if (smartPieces[j][1] == leftPiece[0])
+                    if (smartPieces[j][1] == leftPiece.GetLeft())
                     {
                         pieceToPlay = smartPieces[j];
                         placedOnRight = false;
                         break;
                     }
-                    if (smartPieces[j][1] == rightPiece[1])
+                    if (smartPieces[j][1] == leftPiece.GetRight())
                     {
                         pieceToPlay = smartPieces[j];
                         placedOnRight = true;
@@ -109,9 +109,9 @@ public class SmartAI : DominoPlayer
             {
                 for (int k = 0; k < Hand.Count; k++)
                 {
-                    if (Hand[k][0] == valuesPartnerNotHave[i][j])
+                    if (Hand[k].GetLeft() == valuesPartnerNotHave[i][j])
                         pieceValues[0][k] += teamMissing;
-                    if (Hand[k][1] == valuesPartnerNotHave[i][j])
+                    if (Hand[k].GetRight() == valuesPartnerNotHave[i][j])
                         pieceValues[1][k] += teamMissing;
                 }
             }
@@ -125,9 +125,9 @@ public class SmartAI : DominoPlayer
             {
                 for (int k = 0; k < Hand.Count; k++)
                 {
-                    if (Hand[k][0] == valuesOpponentNothave[i][j])
+                    if (Hand[k].GetLeft() == valuesOpponentNothave[i][j])
                         pieceValues[1][k] += opponentMissing;
-                    if (Hand[k][1] == valuesOpponentNothave[i][j])
+                    if (Hand[k].GetRight() == valuesOpponentNothave[i][j])
                         pieceValues[0][k] += opponentMissing;
                 }
             }
@@ -140,29 +140,29 @@ public class SmartAI : DominoPlayer
         {
             try
             {
-                dict[piece[0]] += 1;
+                dict[piece.GetLeft()] += 1;
             }
             catch
             {
-                dict.Add(piece[0], 1);
+                dict.Add(piece.GetLeft(), 1);
             }
             try
             {
-                dict[piece[1]] += 1;
+                dict[piece.GetRight()] += 1;
             }
             catch
             {
-                dict.Add(piece[1], 1);
+                dict.Add(piece.GetRight(), 1);
             }
         }
         var keys = dict.Keys.ToList();
         for (int i = 0; i < pieceValues.GetLength(1); i++)
         {
             int up = 1;
-            int index = keys.IndexOf(Hand[i][0]);
+            int index = keys.IndexOf(Hand[i].GetLeft());
             if (index == -1)
             {
-                index = keys.IndexOf(Hand[i][1]);
+                index = keys.IndexOf(Hand[i].GetRight());
                 up = 0;
             }
             pieceValues[index][up] += dict[keys[i]] * sameNumber;
