@@ -10,39 +10,40 @@ namespace DominoPlayer
     {
         private readonly int sideA;
         private readonly int sideB;
+        public int Left => reversed ? sideB : sideA;
+        public int Right => reversed ? sideA : sideB;
+
         private bool reversed;
-        public Piece(int valueA, int valueB)
+
+        private readonly IRules gameRules;
+
+        public Piece(int valueA, int valueB, IRules rules)
         {
-            this.sideA = valueA;
-            this.sideB = valueB;
-            this.reversed = false;
+            sideA = valueA;
+            sideB = valueB;
+            reversed = false;
+            gameRules = rules;
         }
         public void Reverse()
         {
             reversed = !reversed;
         }
+
         public bool CanMatch(Piece other, bool right, out bool reversed)
         {
-            var compare = (Piece a, Piece b) =>
-            (right ? a.GetRight() : a.GetLeft()) == (right ? other.GetLeft() : other.GetRight());
-
-            bool nonReversedComparison = compare(this, other);
+            reversed = false;
+            bool nonReversedComparison = gameRules.CanPiecesMatch(this, other, right);
 
             if (nonReversedComparison)
-            {
-                reversed = false;
                 return true;
-            }
-            else
-            {
-                reversed = true;
-                other.Reverse();
 
-                return compare(this, other);
-            }
+
+            reversed = true;
+            other.Reverse();
+
+            return gameRules.CanPiecesMatch(this, other, right);
         }
-        public int GetLeft() => reversed ? sideB : sideA;
-        public int GetRight() => reversed ? sideA : sideB;
+
 
         public override bool Equals(object? obj)
         {
@@ -59,7 +60,7 @@ namespace DominoPlayer
         }
         public static bool operator ==(Piece a, Piece b)
         {
-            var eq = (Piece l, Piece r) => l.GetLeft() == r.GetLeft() && l.GetRight() == r.GetRight();
+            var eq = (Piece l, Piece r) => l.Left == r.Left && l.Right == r.Right;
 
             bool initialComparison = eq(a, b);
 
