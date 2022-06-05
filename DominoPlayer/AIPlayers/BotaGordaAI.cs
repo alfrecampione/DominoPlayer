@@ -1,3 +1,4 @@
+using System.IO.MemoryMappedFiles;
 namespace DominoPlayer.AI;
 
 public class BotaGordaAI : DominoPlayer
@@ -9,8 +10,21 @@ public class BotaGordaAI : DominoPlayer
     {
         var possiblePieces = GameReference.GetPlayablePieces(Hand);
 
-        (Piece piece, bool right) = possiblePieces.MaxBy(p => p.piece.GetLeft() + p.piece.GetRight());
+        if (possiblePieces == null || !possiblePieces.Any())
+            return Move.CreatePass(PlayerID);
 
-        return new Move(this.PlayerID, piece, false, right);
+        var (piece, canMatchLeft, canMatchRight, reverseLeft, reverseRight) = possiblePieces.MaxBy(p => p.piece.Left + p.piece.Right);
+
+        if (canMatchRight && reverseRight || canMatchLeft && reverseLeft)
+            piece.Reverse();
+
+        if (canMatchLeft && canMatchRight)
+        {
+            bool right = new Random().Next(2) == 0;
+
+            return Move.CreateMove(PlayerID, piece, right);
+        }
+
+        return Move.CreateMove(PlayerID, piece, canMatchRight);
     }
 }

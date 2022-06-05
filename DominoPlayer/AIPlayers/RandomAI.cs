@@ -14,8 +14,21 @@ public class RandomAI : DominoPlayer
     {
         var possiblePieces = GameReference.GetPlayablePieces(Hand);
 
-        var (piece, right) = possiblePieces.ElementAt(generator.Next(possiblePieces.Count()));
+        if (possiblePieces == null || !possiblePieces.Any())
+            return Move.CreatePass(PlayerID);
 
-        return new Move(PlayerID, piece, false, right);
+        var (piece, canMatchLeft, canMatchRight, reverseLeft, reverseRight) = possiblePieces.ElementAt(generator.Next(possiblePieces.Count()));
+
+        if (canMatchRight && reverseRight || canMatchLeft && reverseLeft)
+            piece.Reverse();
+
+        if (canMatchLeft && canMatchRight)
+        {
+            bool right = new Random().Next(2) == 0;
+
+            return Move.CreateMove(PlayerID, piece, right);
+        }
+
+        return Move.CreateMove(PlayerID, piece, canMatchRight);
     }
 }
