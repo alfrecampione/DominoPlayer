@@ -1,64 +1,78 @@
-﻿using System.Linq;
-using System.Collections.Generic;
-using System;
-
-namespace DominoPlayer;
+﻿namespace DominoPlayer;
 
 public class DominoGame
 {
-    public int PiecesInGame
-    {
-        get { return gamePieces.Count; }
-    }
-    public Piece this[int i]
-    {
-        get { return gamePieces[i]; }
-    }
-
-    DominoPlayer[]? players;
-    readonly List<Piece> gamePieces;
-    readonly List<Piece> undistributedPieces;
-    readonly int piecesPerHand;
+    public int PiecesInGame => gamePieces.Count;
     public int CurrentPlayer { get; private set; }
+
+    private readonly List<DominoPlayer> players;
+    private readonly List<Piece> gamePieces;
+    private readonly List<Piece> undistributedPieces;
+
+    private readonly IRules gameRules;
 
     public event Action<Move>? OnMoveMade;
 
-    public DominoGame(int piecesPerHand, int maxValue)
+    public DominoGame(IRules rules)
     {
-        // TODO: Only one parameter should be needed by the ctor, an IRules implementation.
-        this.undistributedPieces = new List<Piece>();
-        this.gamePieces = new List<Piece>();
-        this.piecesPerHand = piecesPerHand;
+        gameRules = rules;
+        undistributedPieces = new List<Piece>();
+        gamePieces = new List<Piece>();
+        players = new List<DominoPlayer>(rules.MaxPlayers);
 
-        for (int i = 0; i <= maxValue; i++)
-            for (int e = i; e <= maxValue; e++)
-                this.undistributedPieces.Add(new Piece(i, e));
+        for (int i = 0; i <= rules.MaxPieceValue; i++)
+            for (int e = i; e <= rules.MaxPieceValue; e++)
+                undistributedPieces.Add(new Piece(i, e, rules));
+    }
+    private List<Piece> CreateHand()
+    {
+        Random random = new();
+        List<Piece> hand = new();
+
+        if (gameRules.PiecesPerHand > undistributedPieces.Count)
+            throw new IndexOutOfRangeException("Can't create hand. Insufficient pieces.");
+
+        for (int i = 0; i < gameRules.PiecesPerHand; i++)
+        {
+            int index = random.Next(undistributedPieces.Count);
+            hand.Add(undistributedPieces[index]);
+            undistributedPieces.RemoveAt(index);
+        }
+        return hand;
     }
     public void StartGame(DominoPlayer[] players)
     {
-        this.players = players;
+        if (players.Length > gameRules.MaxPlayers || players.Length < gameRules.MinPlayers)
+            throw new DominoException($"Tried to start game with {players.Length} players, this is not allowed by current rules.");
+
+        this.players.Clear();
+        this.players.AddRange(players);
+
         foreach (var player in this.players)
             player.StartGame(CreateHand());
 
-        CurrentPlayer = new Random().Next(players.Length);
-    }
-    public bool IsGameOver(out int winner)
-    {
-        //TODO: Many things.
-        winner = 0;
-        return false;
+        CurrentPlayer = new Random().Next(this.players.Count);
     }
 
-    public IEnumerable<(Piece piece, bool right)> GetPlayablePieces(IEnumerable<Piece> hand)
+    public bool IsGameOver(out int winner)
+        => gameRules.GameOverCondition(this, out winner);
+
+    public IEnumerable<(Piece piece, bool canMatchLeft, bool canMatchRight, bool reverseLeft, bool reverseRight)> GetPlayablePieces(IEnumerable<Piece> hand)
     {
         (Piece leftPiece, Piece rightPiece) =
-            (
-                GetPieceOnExtreme(false),
-                GetPieceOnExtreme(true)
-            );
-        return from piece in hand
-               where leftPiece.CanMatch(piece, false) || rightPiece.CanMatch(piece, true)
-               select (piece, rightPiece.CanMatch(piece, true));
+        (
+            GetPieceOnExtreme(false),
+            GetPieceOnExtreme(true)
+        );
+
+        foreach (Piece p in hand)
+        {
+            bool matchLeft = leftPiece.CanMatch(p, false, out bool reverseLeft);
+            bool matchRight = rightPiece.CanMatch(p, true, out bool reverseRight);
+
+            if (matchLeft || matchRight)
+                yield return (p, matchLeft, matchRight, reverseLeft, reverseRight);
+        }
     }
     public void MakeMove(Move move)
     {
@@ -73,31 +87,14 @@ public class DominoGame
     public void NextTurn()
     {
         if (players is null)
-            throw new DominoException("Game not started");
+            throw new DominoException("Tried to call NextTurn but game has not started yet.");
 
         MakeMove(players[CurrentPlayer].GetMove());
         CurrentPlayer++;
 
-        if (CurrentPlayer >= players.Length)
+        if (CurrentPlayer >= players.Count)
             CurrentPlayer = 0;
     }
-    List<Piece> CreateHand()
-    {
-        Random random = new();
-        List<Piece> hand = new();
-
-        if (piecesPerHand > undistributedPieces.Count)
-            throw new IndexOutOfRangeException("Can't create hand. Insufficient pieces.");
-
-        for (int i = 0; i < piecesPerHand; i++)
-        {
-            int index = random.Next(undistributedPieces.Count);
-            hand.Add(undistributedPieces[index]);
-            undistributedPieces.RemoveAt(index);
-        }
-        return hand;
-    }
-
     public Piece GetPieceOnExtreme(bool right)
     {
         return gamePieces[right ? ^1 : 0];
