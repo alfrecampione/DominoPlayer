@@ -25,6 +25,7 @@ public class DominoGame
 
     public DominoGame(int piecesPerHand, int maxValue)
     {
+        // TODO: Only one parameter should be needed by the ctor, an IRules implementation.
         this.undistributedPieces = new List<Piece>();
         this.gamePieces = new List<Piece>();
         this.piecesPerHand = piecesPerHand;
