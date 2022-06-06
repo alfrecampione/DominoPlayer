@@ -23,9 +23,44 @@ public class Program
     }
     const int TURNS_PAUSE = 500;
     static DominoGame? game;
+    public class ClassicGame : IRules
+    {
+        public int PiecesPerHand { get; }
+        public int MaxPieceValue { get; }
+        public int MaxPlayers { get; }
+        public int MinPlayers { get; }
+        public ClassicGame(int piecesPerHand, int maxPieceValue, int maxPlayer, int minPlayers)
+        {
+            this.PiecesPerHand = piecesPerHand;
+            this.MaxPieceValue = maxPieceValue;
+            this.MaxPlayers = maxPlayer;
+            this.MinPlayers = minPlayers;
+        }
+        public bool GameOverCondition(DominoGame game, out int winner)
+        {
+            //Need a way to know each player's hand
+            winner = -1;
+            return false;
+        }
+        public bool CanPiecesMatch(Piece a, Piece b, bool leftToRight)
+        {
+            if (leftToRight)
+            {
+                if (a.Right == b.Left)
+                    return true;
+            }
+            else
+            {
+                if (a.Left == b.Right)
+                    return true;
+            }
+            return false;
+        }
+    }
     static void PlayDomino()
     {
-        game = new(10, 6);
+        IRules classicRules = new ClassicGame(10, 9, 4, 2);
+        game = new(classicRules);
 
         game.OnMoveMade += OnDominoMove;
 
