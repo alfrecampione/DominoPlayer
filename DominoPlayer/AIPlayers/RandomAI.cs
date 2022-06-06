@@ -1,34 +1,39 @@
-namespace DominoPlayer.AI;
+using System;
+using System.Linq;
 
-public class RandomAI : DominoPlayer
+namespace DominoPlayer.AI
 {
-    private readonly Random generator;
-
-    public RandomAI(int playerID, DominoGame game)
-    : base(playerID, game)
+    public class RandomAI : DominoPlayer
     {
-        generator = new Random();
-    }
+        private readonly Random generator;
 
-    public override Move GetMove()
-    {
-        var possiblePieces = GameReference.GetPlayablePieces(Hand);
-
-        if (possiblePieces == null || !possiblePieces.Any())
-            return Move.CreatePass(PlayerID);
-
-        var (piece, canMatchLeft, canMatchRight, reverseLeft, reverseRight) = possiblePieces.ElementAt(generator.Next(possiblePieces.Count()));
-
-        if (canMatchRight && reverseRight || canMatchLeft && reverseLeft)
-            piece.Reverse();
-
-        if (canMatchLeft && canMatchRight)
+        public RandomAI(int playerID, DominoGame game)
+        : base(playerID, game)
         {
-            bool right = new Random().Next(2) == 0;
-
-            return Move.CreateMove(PlayerID, piece, right);
+            generator = new Random();
         }
 
-        return Move.CreateMove(PlayerID, piece, canMatchRight);
+        public override Move GetMove()
+        {
+            var possiblePieces = GameReference.GetPlayablePieces(Hand);
+
+            if (possiblePieces == null || !possiblePieces.Any())
+                return Move.CreatePass(PlayerID);
+
+            (Piece piece, bool canMatchLeft, bool canMatchRight, bool reverseLeft, bool reverseRight)
+            = possiblePieces.ElementAt(generator.Next(possiblePieces.Count()));
+
+            if (canMatchRight && reverseRight || canMatchLeft && reverseLeft)
+                piece.Reverse();
+
+            if (canMatchLeft && canMatchRight)
+            {
+                bool right = new Random().Next(2) == 0;
+
+                return Move.CreateMove(PlayerID, piece, right);
+            }
+
+            return Move.CreateMove(PlayerID, piece, canMatchRight);
+        }
     }
 }

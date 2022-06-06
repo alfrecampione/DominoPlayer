@@ -1,30 +1,34 @@
-using System.IO.MemoryMappedFiles;
-namespace DominoPlayer.AI;
+using System.Linq;
+using System;
 
-public class BotaGordaAI : DominoPlayer
+namespace DominoPlayer.AI
 {
-    public BotaGordaAI(int playerID, DominoGame game)
-    : base(playerID, game) { }
-
-    public override Move GetMove()
+    public class BotaGordaAI : DominoPlayer
     {
-        var possiblePieces = GameReference.GetPlayablePieces(Hand);
+        public BotaGordaAI(int playerID, DominoGame game)
+        : base(playerID, game) { }
 
-        if (possiblePieces == null || !possiblePieces.Any())
-            return Move.CreatePass(PlayerID);
-
-        var (piece, canMatchLeft, canMatchRight, reverseLeft, reverseRight) = possiblePieces.MaxBy(p => p.piece.Left + p.piece.Right);
-
-        if (canMatchRight && reverseRight || canMatchLeft && reverseLeft)
-            piece.Reverse();
-
-        if (canMatchLeft && canMatchRight)
+        public override Move GetMove()
         {
-            bool right = new Random().Next(2) == 0;
+            var possiblePieces = GameReference.GetPlayablePieces(Hand);
 
-            return Move.CreateMove(PlayerID, piece, right);
+            if (possiblePieces == null || !possiblePieces.Any())
+                return Move.CreatePass(PlayerID);
+
+            (Piece piece, bool canMatchLeft, bool canMatchRight, bool reverseLeft, bool reverseRight)
+            = possiblePieces.OrderByDescending(p => p.piece.Left + p.piece.Right).First();
+
+            if (canMatchRight && reverseRight || canMatchLeft && reverseLeft)
+                piece.Reverse();
+
+            if (canMatchLeft && canMatchRight)
+            {
+                bool right = new Random().Next(2) == 0;
+
+                return Move.CreateMove(PlayerID, piece, right);
+            }
+
+            return Move.CreateMove(PlayerID, piece, canMatchRight);
         }
-
-        return Move.CreateMove(PlayerID, piece, canMatchRight);
     }
 }

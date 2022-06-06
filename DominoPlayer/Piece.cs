@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DominoPlayer
+﻿namespace DominoPlayer
 {
     public struct Piece
     {
@@ -60,7 +54,7 @@ namespace DominoPlayer
         }
         public static bool operator ==(Piece a, Piece b)
         {
-            var eq = (Piece l, Piece r) => l.Left == r.Left && l.Right == r.Right;
+            static bool eq(Piece l, Piece r) => l.Left == r.Left && l.Right == r.Right;
 
             bool initialComparison = eq(a, b);
 

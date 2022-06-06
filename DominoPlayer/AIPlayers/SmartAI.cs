@@ -1,169 +1,173 @@
-namespace DominoPlayer.AI;
+using System.Collections.Generic;
+using System.Linq;
 
-public class SmartAI : DominoPlayer
+namespace DominoPlayer.AI
 {
-    List<List<double>> valuesPartnerNotHave;
-    List<List<double>> valuesOpponentNothave;
-    const double teamMissing = 0.15;
-    const double opponentMissing = 0.25;
-    const double sameNumber = 0.50;
-
-    public SmartAI(int playerID, DominoGame game, List<List<double>> valuesPartnerNotHave, List<List<double>> valuesOpponentNothave) :
-    base(playerID, game)
+    public class SmartAI : DominoPlayer
     {
-        this.valuesPartnerNotHave = valuesPartnerNotHave;
-        this.valuesOpponentNothave = valuesOpponentNothave;
-    }
+        private readonly List<List<double>> valuesPartnerNotHave;
+        private readonly List<List<double>> valuesOpponentNothave;
+        private const double TEAM_MISSING = 0.15;
+        private const double OPPONENT_MISSING = 0.25;
+        private const double SAME_NUMBER = 0.50;
 
-    public override Move GetMove()
-    {
-        (Piece leftPiece, Piece rightPiece) =
-            (
-                GameReference.GetPieceOnExtreme(false),
-                GameReference.GetPieceOnExtreme(true)
-            );
-
-        //I only need if it can be played, not need for what side, it will checked after
-        var possiblePieces = GameReference.GetPlayablePieces(Hand).Select(p => p.piece);
-
-        var smartPieces = possiblePieces.ToList();
-
-        double[][] pieceValues = new double[possiblePieces.Count()][];
-        for (int i = 0; i < possiblePieces.Count(); i++)
+        public SmartAI(int playerID, DominoGame game, List<List<double>> valuesPartnerNotHave, List<List<double>> valuesOpponentNothave) :
+        base(playerID, game)
         {
-            pieceValues[i] = new double[2];
+            this.valuesPartnerNotHave = valuesPartnerNotHave;
+            this.valuesOpponentNothave = valuesOpponentNothave;
         }
 
-        //------------------------
-        //Assigning values
-        //(Alfredo: I will do it)
-        //The highest value in a piece will be the prefered side to join with the piece on board
-        PointsForTeamMate(smartPieces, valuesPartnerNotHave, pieceValues);
-        PointsForOponnent(smartPieces, valuesOpponentNothave, pieceValues);
-        PointForSameNumber(smartPieces, pieceValues);
-        //Finish assigning
-        //------------------------
-
-
-        List<double> sortedValues = new();
-        for (int i = 0; i < possiblePieces.Count(); i++)
+        public override Move GetMove()
         {
-            sortedValues.AddRange(pieceValues[i]);
-        }
-        //Any way to make this prettier?
-        sortedValues.Sort();
-        sortedValues.Reverse();
-        //------------------------
+            (Piece leftPiece, Piece rightPiece) =
+                (
+                    GameReference.GetPieceOnExtreme(false),
+                    GameReference.GetPieceOnExtreme(true)
+                );
 
-        Piece pieceToPlay = new();
+            //I only need if it can be played, not need for what side, it will checked after
+            var possiblePieces = GameReference.GetPlayablePieces(Hand).Select(p => p.piece);
 
-        bool placedOnRight = default;
+            var smartPieces = possiblePieces.ToList();
 
-        //Check the side to put the piece with the highest side value
-        for (int i = 0; i < sortedValues.Count; i++)
-        {
-            for (int j = 0; j < pieceValues.Length; j++)
+            double[][] pieceValues = new double[possiblePieces.Count()][];
+            for (int i = 0; i < possiblePieces.Count(); i++)
             {
-                if (sortedValues[i] == pieceValues[j][0])
+                pieceValues[i] = new double[2];
+            }
+
+            //------------------------
+            //Assigning values
+            //(Alfredo: I will do it)
+            //The highest value in a piece will be the prefered side to join with the piece on board
+            PointsForTeamMate(smartPieces, valuesPartnerNotHave, pieceValues);
+            PointsForOponnent(smartPieces, valuesOpponentNothave, pieceValues);
+            PointForSameNumber(smartPieces, pieceValues);
+            //Finish assigning
+            //------------------------
+
+
+            List<double> sortedValues = new List<double>();
+            for (int i = 0; i < possiblePieces.Count(); i++)
+            {
+                sortedValues.AddRange(pieceValues[i]);
+            }
+            //Any way to make this prettier?
+            sortedValues.Sort();
+            sortedValues.Reverse();
+            //------------------------
+
+            Piece pieceToPlay = new Piece();
+
+            bool placedOnRight = default;
+
+            //Check the side to put the piece with the highest side value
+            for (int i = 0; i < sortedValues.Count; i++)
+            {
+                for (int j = 0; j < pieceValues.Length; j++)
                 {
-                    if (smartPieces[j].Left == leftPiece.Left)
+                    if (sortedValues[i] == pieceValues[j][0])
                     {
-                        pieceToPlay = smartPieces[j];
-                        placedOnRight = false;
-                        break;
+                        if (smartPieces[j].Left == leftPiece.Left)
+                        {
+                            pieceToPlay = smartPieces[j];
+                            placedOnRight = false;
+                            break;
+                        }
+                        if (smartPieces[j].Left == leftPiece.Right)
+                        {
+                            pieceToPlay = smartPieces[j];
+                            placedOnRight = true;
+                            break;
+                        }
                     }
-                    if (smartPieces[j].Left == leftPiece.Right)
+                    if (sortedValues[i] == pieceValues[j][1])
                     {
-                        pieceToPlay = smartPieces[j];
-                        placedOnRight = true;
-                        break;
-                    }
-                }
-                if (sortedValues[i] == pieceValues[j][1])
-                {
-                    if (smartPieces[j].Right == leftPiece.Left)
-                    {
-                        pieceToPlay = smartPieces[j];
-                        placedOnRight = false;
-                        break;
-                    }
-                    if (smartPieces[j].Right == leftPiece.Right)
-                    {
-                        pieceToPlay = smartPieces[j];
-                        placedOnRight = true;
-                        break;
+                        if (smartPieces[j].Right == leftPiece.Left)
+                        {
+                            pieceToPlay = smartPieces[j];
+                            placedOnRight = false;
+                            break;
+                        }
+                        if (smartPieces[j].Right == leftPiece.Right)
+                        {
+                            pieceToPlay = smartPieces[j];
+                            placedOnRight = true;
+                            break;
+                        }
                     }
                 }
             }
+            return new Move(PlayerID, pieceToPlay, false, placedOnRight);
         }
-        return new Move(PlayerID, pieceToPlay, false, placedOnRight);
-    }
 
-    static void PointsForTeamMate(List<Piece> Hand, List<List<double>> valuesPartnerNotHave, double[][] pieceValues)
-    {
-        for (int i = 0; i < valuesPartnerNotHave.Count; i++)
+        static void PointsForTeamMate(List<Piece> Hand, List<List<double>> valuesPartnerNotHave, double[][] pieceValues)
         {
-            for (int j = 0; j < valuesPartnerNotHave[i].Count; j++)
+            for (int i = 0; i < valuesPartnerNotHave.Count; i++)
             {
-                for (int k = 0; k < Hand.Count; k++)
+                for (int j = 0; j < valuesPartnerNotHave[i].Count; j++)
                 {
-                    if (Hand[k].Left == valuesPartnerNotHave[i][j])
-                        pieceValues[0][k] += teamMissing;
-                    if (Hand[k].Right == valuesPartnerNotHave[i][j])
-                        pieceValues[1][k] += teamMissing;
-                }
-            }
-        }
-    }
-    static void PointsForOponnent(List<Piece> Hand, List<List<double>> valuesOpponentNothave, double[][] pieceValues)
-    {
-        for (int i = 0; i < valuesOpponentNothave.Count; i++)
-        {
-            for (int j = 0; j < valuesOpponentNothave[i].Count; j++)
-            {
-                for (int k = 0; k < Hand.Count; k++)
-                {
-                    if (Hand[k].Left == valuesOpponentNothave[i][j])
-                        pieceValues[1][k] += opponentMissing;
-                    if (Hand[k].Right == valuesOpponentNothave[i][j])
-                        pieceValues[0][k] += opponentMissing;
+                    for (int k = 0; k < Hand.Count; k++)
+                    {
+                        if (Hand[k].Left == valuesPartnerNotHave[i][j])
+                            pieceValues[0][k] += TEAM_MISSING;
+                        if (Hand[k].Right == valuesPartnerNotHave[i][j])
+                            pieceValues[1][k] += TEAM_MISSING;
+                    }
                 }
             }
         }
-    }
-    static void PointForSameNumber(List<Piece> Hand, double[][] pieceValues)
-    {
-        Dictionary<double, int> dict = new();
-        foreach (var piece in Hand)
+        static void PointsForOponnent(List<Piece> Hand, List<List<double>> valuesOpponentNothave, double[][] pieceValues)
         {
-            try
+            for (int i = 0; i < valuesOpponentNothave.Count; i++)
             {
-                dict[piece.Left] += 1;
-            }
-            catch
-            {
-                dict.Add(piece.Left, 1);
-            }
-            try
-            {
-                dict[piece.Right] += 1;
-            }
-            catch
-            {
-                dict.Add(piece.Right, 1);
+                for (int j = 0; j < valuesOpponentNothave[i].Count; j++)
+                {
+                    for (int k = 0; k < Hand.Count; k++)
+                    {
+                        if (Hand[k].Left == valuesOpponentNothave[i][j])
+                            pieceValues[1][k] += OPPONENT_MISSING;
+                        if (Hand[k].Right == valuesOpponentNothave[i][j])
+                            pieceValues[0][k] += OPPONENT_MISSING;
+                    }
+                }
             }
         }
-        var keys = dict.Keys.ToList();
-        for (int i = 0; i < pieceValues.GetLength(1); i++)
+        static void PointForSameNumber(List<Piece> Hand, double[][] pieceValues)
         {
-            int up = 1;
-            int index = keys.IndexOf(Hand[i].Left);
-            if (index == -1)
+            Dictionary<double, int> dict = new Dictionary<double, int>();
+            foreach (var piece in Hand)
             {
-                index = keys.IndexOf(Hand[i].Right);
-                up = 0;
+                try
+                {
+                    dict[piece.Left] += 1;
+                }
+                catch
+                {
+                    dict.Add(piece.Left, 1);
+                }
+                try
+                {
+                    dict[piece.Right] += 1;
+                }
+                catch
+                {
+                    dict.Add(piece.Right, 1);
+                }
             }
-            pieceValues[index][up] += dict[keys[i]] * sameNumber;
+            var keys = dict.Keys.ToList();
+            for (int i = 0; i < pieceValues.GetLength(1); i++)
+            {
+                int up = 1;
+                int index = keys.IndexOf(Hand[i].Left);
+                if (index == -1)
+                {
+                    index = keys.IndexOf(Hand[i].Right);
+                    up = 0;
+                }
+                pieceValues[index][up] += dict[keys[i]] * SAME_NUMBER;
+            }
         }
     }
 }
