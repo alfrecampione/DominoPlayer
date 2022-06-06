@@ -1,26 +1,27 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System;
 
 namespace DominoPlayer
 {
     public class DominoGame
     {
-        public int PiecesInGame => gamePieces.Count;
+        public int PiecesInGame => records.Count;
         public int CurrentPlayer { get; private set; }
 
         private readonly List<DominoPlayer> players;
-        private readonly List<Piece> gamePieces;
         private readonly List<Piece> undistributedPieces;
 
         private readonly IRules gameRules;
 
+        public List<Move> records;
         public event Action<Move>? OnMoveMade;
 
         public DominoGame(IRules rules)
         {
             gameRules = rules;
+            records = new List<Move>();
             undistributedPieces = new List<Piece>();
-            gamePieces = new List<Piece>();
             players = new List<DominoPlayer>(rules.MaxPlayers);
 
             for (int i = 0; i <= rules.MaxPieceValue; i++)
@@ -80,10 +81,7 @@ namespace DominoPlayer
         public void MakeMove(Move move)
         {
             if (!move.passed)
-                if (move.placedOnRight)
-                    gamePieces.Add(move.piecePlaced);
-                else
-                    gamePieces.Insert(0, move.piecePlaced);
+                records.Append(move);
 
             OnMoveMade?.Invoke(move);
         }
@@ -100,7 +98,12 @@ namespace DominoPlayer
         }
         public Piece GetPieceOnExtreme(bool right)
         {
-            return gamePieces[right ? ^1 : 0];
+            for (int i = records.Count - 1; i >= 0; i--)
+            {
+                if (records[i].placedOnRight == right)
+                    return records[i].piecePlaced;
+            }
+            return records[0].piecePlaced;
         }
     }
 }

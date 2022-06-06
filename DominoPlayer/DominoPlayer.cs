@@ -6,7 +6,7 @@ namespace DominoPlayer
         public int PlayerID { get; }
         protected DominoGame GameReference { get; }
         protected List<Piece> Hand { get; set; }
-
+        public int Count { get { return Hand.Count; } }
         public DominoPlayer(int playerID, DominoGame game)
         => (PlayerID, GameReference, Hand) = (playerID, game, new List<Piece>());
         public abstract Move GetMove();
