@@ -112,7 +112,7 @@ public class Program
         }
     }
     static string PaintPiece(Piece piece)
-        => $"[{NumberToEmoji(piece.GetLeft())}|{NumberToEmoji(piece.GetRight())}]";
+        => $"[{NumberToEmoji(piece.Left)}|{NumberToEmoji(piece.Right)}]";
     static string NumberToEmoji(int num) => num switch
     {
         0 => "0️⃣",
