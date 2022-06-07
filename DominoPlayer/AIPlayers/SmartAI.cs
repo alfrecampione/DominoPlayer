@@ -100,6 +100,7 @@ namespace DominoPlayer.AI
                     }
                 }
             }
+            Hand.Remove(pieceToPlay);
             return Move.CreateMove(PlayerID, pieceToPlay, placedOnRight);
         }
 

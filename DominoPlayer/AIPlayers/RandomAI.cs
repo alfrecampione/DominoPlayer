@@ -29,10 +29,10 @@ namespace DominoPlayer.AI
             if (canMatchLeft && canMatchRight)
             {
                 bool right = new Random().Next(2) == 0;
-
+                Hand.Remove(piece);
                 return Move.CreateMove(PlayerID, piece, right);
             }
-
+            Hand.Remove(piece);
             return Move.CreateMove(PlayerID, piece, canMatchRight);
         }
     }

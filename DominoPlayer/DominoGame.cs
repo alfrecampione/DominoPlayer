@@ -84,27 +84,30 @@ namespace DominoPlayer
                 GetPieceOnExtreme(false),
                 GetPieceOnExtreme(true)
             );
-            if (leftPiece == null)
+            if (leftPiece.Left == -1)
             {
                 foreach (Piece p in hand)
                 {
                     yield return (p, true, true, false, false);
                 }
             }
-            foreach (Piece p in hand)
+            else
             {
-                bool matchLeft = leftPiece.CanMatch(p, false, out bool reverseLeft);
-                bool matchRight = rightPiece.CanMatch(p, true, out bool reverseRight);
+                foreach (Piece p in hand)
+                {
+                    bool matchLeft = leftPiece.CanMatch(p, false, out bool reverseLeft);
+                    bool matchRight = rightPiece.CanMatch(p, true, out bool reverseRight);
 
-                if (matchLeft || matchRight)
-                    yield return (p, matchLeft, matchRight, reverseLeft, reverseRight);
+                    if (matchLeft || matchRight)
+                        yield return (p, matchLeft, matchRight, reverseLeft, reverseRight);
+                }
             }
         }
         public void MakeMove(Move move)
         {
             if (!move.passed)
             {
-                history.Append(move);
+                history.Add(move);
                 if (move.placedOnRight)
                 {
                     rightExtreme = history.Count - 1;
@@ -130,7 +133,7 @@ namespace DominoPlayer
         public Piece GetPieceOnExtreme(bool right)
         {
             if (history.Count == 0)
-                return new Piece();
+                return new Piece(-1, -1, gameRules);
             return (right) ? history[rightExtreme].piecePlaced : history[leftExtreme].piecePlaced;
         }
     }

@@ -133,7 +133,7 @@ public class Program
             if (move.placedOnRight)
                 dominoBoard.Add(move.piecePlaced);
             else
-                dominoBoard.Prepend(move.piecePlaced);
+                dominoBoard.Insert(0, move.piecePlaced);
 
         RepaintDominoBoard();
     }
