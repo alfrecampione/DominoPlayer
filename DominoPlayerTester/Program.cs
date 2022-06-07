@@ -60,7 +60,7 @@ public class Program
             }
             if (passCount == players.Length)
             {
-                var sum = (from player in players select player.GetPieces().Sum(p => p.Left + p.Right)).ToList();
+                var sum = (from player in players select player.Hand.Sum(p => p.Left + p.Right)).ToList();
                 int min = int.MaxValue;
                 int index = -1;
                 for (int i = 0; i < players.Length; i++)
