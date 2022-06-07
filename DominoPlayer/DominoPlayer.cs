@@ -16,5 +16,12 @@ namespace DominoPlayer
             Hand.Clear();
             Hand.AddRange(startingHand);
         }
+        //We need a way to have the pieces for GameOver conditions, it's not useful make a function foreach case
+        public Piece[] GetPieces()
+        {
+            Piece[] copy = new Piece[Hand.Count];
+            Hand.CopyTo(copy);
+            return copy;
+        }
     }
 }

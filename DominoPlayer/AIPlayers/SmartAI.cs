@@ -25,9 +25,10 @@ namespace DominoPlayer.AI
                     GameReference.GetPieceOnExtreme(false),
                     GameReference.GetPieceOnExtreme(true)
                 );
-
             //I only need if it can be played, not need for what side, it will checked after
             var possiblePieces = GameReference.GetPlayablePieces(Hand).Select(p => p.piece);
+            if (possiblePieces == null || !possiblePieces.Any())
+                return Move.CreatePass(PlayerID);
 
             var smartPieces = possiblePieces.ToList();
 
@@ -99,7 +100,7 @@ namespace DominoPlayer.AI
                     }
                 }
             }
-            return new Move(PlayerID, pieceToPlay, false, placedOnRight);
+            return Move.CreateMove(PlayerID, pieceToPlay, placedOnRight);
         }
 
         static void PointsForTeamMate(List<Piece> Hand, List<List<double>> valuesPartnerNotHave, double[][] pieceValues)

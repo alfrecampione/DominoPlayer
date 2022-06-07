@@ -36,11 +36,50 @@ public class Program
             this.MaxPlayers = maxPlayer;
             this.MinPlayers = minPlayers;
         }
+
+        //If winner == -1 anybody win
+        //Missing draw implementation
         public bool GameOverCondition(DominoGame game, out int winner)
         {
-            //Need a way to know each player's hand
-            winner = -1;
-            return false;
+            var players = game.Players;
+            for (int i = 0; i < players.Length; i++)
+            {
+                if (players[i].Count == 0)
+                {
+                    winner = i;
+                    return true;
+                }
+            }
+            int passCount = 0;
+            for (int i = game.history.Count - 1; i >= 0; i--)
+            {
+                if (game.history[i].passed)
+                    passCount++;
+                else
+                    break;
+            }
+            if (passCount == players.Length)
+            {
+                var sum = (from player in players select player.GetPieces().Sum(p => p.Left + p.Right)).ToList();
+                int min = int.MaxValue;
+                int index = -1;
+                for (int i = 0; i < players.Length; i++)
+                {
+                    if (sum[i] < min)
+                    {
+                        min = sum[i];
+                        index = i;
+                    }
+                }
+                winner = index;
+                return true;
+            }
+            else
+            {
+                winner = -1;
+                return false;
+            }
+
         }
         public bool CanPiecesMatch(Piece a, Piece b, bool leftToRight)
         {
@@ -94,7 +133,7 @@ public class Program
             if (move.placedOnRight)
                 dominoBoard.Add(move.piecePlaced);
             else
-                dominoBoard.Insert(0, move.piecePlaced);
+                dominoBoard.Prepend(move.piecePlaced);
 
         RepaintDominoBoard();
     }

@@ -6,21 +6,36 @@ namespace DominoPlayer
 {
     public class DominoGame
     {
-        public int PiecesInGame => records.Count;
+        public int PiecesInGame => history.Count;
         public int CurrentPlayer { get; private set; }
 
+        private int leftExtreme;
+        private int rightExtreme;
+        //We will need a few things in players, it is not useful make a property for each thing that we need, so i will pass a copy
+        //To prevent that someone modify something.
+        public DominoPlayer[] Players
+        {
+            get
+            {
+                DominoPlayer[] copy = new DominoPlayer[players.Count];
+                players.CopyTo(copy);
+                return copy;
+            }
+        }
         private readonly List<DominoPlayer> players;
         private readonly List<Piece> undistributedPieces;
 
         private readonly IRules gameRules;
 
-        public List<Move> records;
+        public List<Move> history;
         public event Action<Move>? OnMoveMade;
 
         public DominoGame(IRules rules)
         {
+            leftExtreme = 0;
+            rightExtreme = 0;
             gameRules = rules;
-            records = new List<Move>();
+            history = new List<Move>();
             undistributedPieces = new List<Piece>();
             players = new List<DominoPlayer>(rules.MaxPlayers);
 
@@ -61,6 +76,7 @@ namespace DominoPlayer
         public bool IsGameOver(out int winner)
             => gameRules.GameOverCondition(this, out winner);
 
+
         public IEnumerable<(Piece piece, bool canMatchLeft, bool canMatchRight, bool reverseLeft, bool reverseRight)> GetPlayablePieces(IEnumerable<Piece> hand)
         {
             (Piece leftPiece, Piece rightPiece) =
@@ -68,7 +84,13 @@ namespace DominoPlayer
                 GetPieceOnExtreme(false),
                 GetPieceOnExtreme(true)
             );
-
+            if (leftPiece == null)
+            {
+                foreach (Piece p in hand)
+                {
+                    yield return (p, true, true, false, false);
+                }
+            }
             foreach (Piece p in hand)
             {
                 bool matchLeft = leftPiece.CanMatch(p, false, out bool reverseLeft);
@@ -81,8 +103,17 @@ namespace DominoPlayer
         public void MakeMove(Move move)
         {
             if (!move.passed)
-                records.Append(move);
-
+            {
+                history.Append(move);
+                if (move.placedOnRight)
+                {
+                    rightExtreme = history.Count - 1;
+                }
+                else
+                {
+                    leftExtreme = history.Count - 1;
+                }
+            }
             OnMoveMade?.Invoke(move);
         }
         public void NextTurn()
@@ -98,12 +129,9 @@ namespace DominoPlayer
         }
         public Piece GetPieceOnExtreme(bool right)
         {
-            for (int i = records.Count - 1; i >= 0; i--)
-            {
-                if (records[i].placedOnRight == right)
-                    return records[i].piecePlaced;
-            }
-            return records[0].piecePlaced;
+            if (history.Count == 0)
+                return new Piece();
+            return (right) ? history[rightExtreme].piecePlaced : history[leftExtreme].piecePlaced;
         }
     }
 }
