@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace DominoPlayer.AI
 {
-    public class SmartAI : DominoPlayer
+    public class SmartAI : AIPlayer
     {
         private readonly List<List<double>> valuesPartnerNotHave;
         private readonly List<List<double>> valuesOpponentNothave;
@@ -18,7 +18,7 @@ namespace DominoPlayer.AI
             this.valuesOpponentNothave = valuesOpponentNothave;
         }
 
-        public override Move GetMove()
+        protected override Move InternalGetMove()
         {
             (Piece leftPiece, Piece rightPiece) =
                 (
@@ -100,7 +100,6 @@ namespace DominoPlayer.AI
                     }
                 }
             }
-            Hand.Remove(pieceToPlay);
             return Move.CreateMove(PlayerID, pieceToPlay, placedOnRight);
         }
 

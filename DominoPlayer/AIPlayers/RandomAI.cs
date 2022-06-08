@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace DominoPlayer.AI
 {
-    public class RandomAI : DominoPlayer
+    public class RandomAI : AIPlayer
     {
         private readonly Random generator;
 
@@ -13,7 +13,7 @@ namespace DominoPlayer.AI
             generator = new Random();
         }
 
-        public override Move GetMove()
+        protected override Move InternalGetMove()
         {
             var possiblePieces = GameReference.GetPlayablePieces(Hand);
 
@@ -29,10 +29,8 @@ namespace DominoPlayer.AI
             if (canMatchLeft && canMatchRight)
             {
                 bool right = new Random().Next(2) == 0;
-                Hand.Remove(piece);
                 return Move.CreateMove(PlayerID, piece, right);
             }
-            Hand.Remove(piece);
             return Move.CreateMove(PlayerID, piece, canMatchRight);
         }
     }
