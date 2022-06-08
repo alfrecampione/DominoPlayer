@@ -4,28 +4,20 @@ using System;
 
 namespace DominoPlayer
 {
-    public class DominoGame
+    public sealed class DominoGame
     {
         public int PiecesInGame => history.Count;
         public int CurrentPlayer { get; private set; }
 
         private int leftExtreme;
         private int rightExtreme;
-        //We will need a few things in players, it is not useful make a property for each thing that we need, so i will pass a copy
-        //To prevent that someone modify something.
-        public DominoPlayer[] Players
-        {
-            get
-            {
-                DominoPlayer[] copy = new DominoPlayer[players.Count];
-                players.CopyTo(copy);
-                return copy;
-            }
-        }
+
+        public List<DominoPlayer> Players => players;
+
         private readonly List<DominoPlayer> players;
         private readonly List<Piece> undistributedPieces;
 
-        private readonly IRules gameRules;
+        internal readonly IRules gameRules;
 
         public List<Move> history;
         public event Action<Move>? OnMoveMade;
@@ -87,9 +79,7 @@ namespace DominoPlayer
             if (leftPiece.Left == -1)
             {
                 foreach (Piece p in hand)
-                {
                     yield return (p, true, true, false, false);
-                }
             }
             else
             {
@@ -105,17 +95,13 @@ namespace DominoPlayer
         }
         public void MakeMove(Move move)
         {
+            history.Add(move);
             if (!move.passed)
             {
-                history.Add(move);
                 if (move.placedOnRight)
-                {
                     rightExtreme = history.Count - 1;
-                }
                 else
-                {
                     leftExtreme = history.Count - 1;
-                }
             }
             OnMoveMade?.Invoke(move);
         }
