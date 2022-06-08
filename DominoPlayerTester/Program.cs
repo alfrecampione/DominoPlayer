@@ -3,7 +3,7 @@ namespace DominoPlayer.Tester;
 
 public class Program
 {
-    static void Main(string[] args)
+    static void Main()
     {
         while (true)
         {
@@ -37,19 +37,16 @@ public class Program
             this.MinPlayers = minPlayers;
         }
 
-        //If winner == -1 anybody win
-        //Missing draw implementation
         public bool GameOverCondition(DominoGame game, out int winner)
         {
             var players = game.Players;
-            for (int i = 0; i < players.Length; i++)
-            {
-                if (players[i].Count == 0)
+            foreach (var player in players)
+                if (player.PiecesInHand == 0)
                 {
-                    winner = i;
+                    winner = player.PlayerID;
                     return true;
                 }
-            }
+
             int passCount = 0;
             for (int i = game.history.Count - 1; i >= 0; i--)
             {
@@ -58,28 +55,15 @@ public class Program
                 else
                     break;
             }
-            if (passCount == players.Length)
+
+            if (passCount >= players.Count)
             {
-                var sum = (from player in players select player.Hand.Sum(p => p.Left + p.Right)).ToList();
-                int min = int.MaxValue;
-                int index = -1;
-                for (int i = 0; i < players.Length; i++)
-                {
-                    if (sum[i] < min)
-                    {
-                        min = sum[i];
-                        index = i;
-                    }
-                }
-                winner = index;
+                winner = players.OrderBy(p => p.GetPlayerScore()).First().PlayerID;
                 return true;
             }
-            else
-            {
-                winner = -1;
-                return false;
-            }
 
+            winner = -1;
+            return false;
         }
         public bool CanPiecesMatch(Piece a, Piece b, bool leftToRight)
         {
@@ -95,9 +79,13 @@ public class Program
             }
             return false;
         }
+
+        public double GetHandScore(DominoGame game, IEnumerable<Piece> hand)
+         => hand.Sum(p => p.Left + p.Right);
     }
     static void PlayDomino()
     {
+        dominoBoard.Clear();
         IRules classicRules = new ClassicGame(10, 9, 4, 2);
         game = new(classicRules);
 
@@ -124,7 +112,7 @@ public class Program
     }
     static void DominoGameOver(int winner)
     {
-
+        System.Console.WriteLine($"It's over, Player {winner} won!!!!");
     }
     static readonly List<Piece> dominoBoard = new();
     static void OnDominoMove(Move move)
@@ -139,9 +127,11 @@ public class Program
     }
     static void RepaintDominoBoard()
     {
+        if (game == null) return;
+
         Console.Clear();
         Console.WriteLine($@"Players: {2}
-            Current Player: {game?.CurrentPlayer}");
+            Current Player: {game.CurrentPlayer}");
 
         Console.WriteLine();
 
@@ -149,9 +139,23 @@ public class Program
         {
             Console.Write(PaintPiece(piece));
         }
+        System.Console.WriteLine("\n");
+
+        foreach (var player in game.Players) //if (player.GetType().IsSubclassOf(typeof(AIPlayer)))
+        {
+            if (player is not AIPlayer ai) continue;
+
+            System.Console.WriteLine($"Player{player.PlayerID}'s Hand:");
+            foreach (var piece in ai.GetHand())
+            {
+                Console.Write(PaintPiece(piece));
+            }
+            System.Console.WriteLine("\n");
+        }
+
     }
     static string PaintPiece(Piece piece)
-        => $"[{NumberToEmoji(piece.Left)}|{NumberToEmoji(piece.Right)}]";
+        => $"[{NumberToEmoji(piece.Left)} |{NumberToEmoji(piece.Right)} ]";
     static string NumberToEmoji(int num) => num switch
     {
         0 => "0️⃣",
