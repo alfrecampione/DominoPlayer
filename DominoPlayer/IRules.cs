@@ -1,4 +1,6 @@
-﻿namespace DominoPlayer
+﻿using System.Collections.Generic;
+
+namespace DominoPlayer
 {
     public interface IRules
     {
@@ -19,5 +21,6 @@
         /// <param name="leftToRight">True if pieces are to be compared left to right,
         /// as A / B, false otherwise.</param>
         public bool CanPiecesMatch(Piece a, Piece b, bool leftToRight);
+        public double GetHandScore(DominoGame game, IEnumerable<Piece> hand);
     }
 }
