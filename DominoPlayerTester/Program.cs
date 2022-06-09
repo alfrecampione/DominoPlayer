@@ -92,8 +92,6 @@ public class Program
         game.OnMoveMade += OnDominoMove;
         DominoPlayer smartAI_0 = new SmartAI(0, game);
         DominoPlayer smartAI_1 = new SmartAI(1, game);
-        DominoPlayer smartAI_2 = new SmartAI(2, game);
-        DominoPlayer smartAI_3 = new SmartAI(3, game);
 
         smartAI_0.SetOpponents(1);
         smartAI_1.SetOpponents(0);
@@ -105,8 +103,8 @@ public class Program
         {
             game.NextTurn();
 
-            Console.ReadLine();
-            //Thread.Sleep(TURNS_PAUSE);
+            //Console.ReadLine();
+            Thread.Sleep(TURNS_PAUSE);
 
             if (game.IsGameOver(out int winner))
             {
