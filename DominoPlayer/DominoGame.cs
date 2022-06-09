@@ -51,7 +51,7 @@ namespace DominoPlayer
             }
             return hand;
         }
-        public void StartGame(DominoPlayer[] players)
+        public void StartGame(params DominoPlayer[] players)
         {
             if (players.Length > gameRules.MaxPlayers || players.Length < gameRules.MinPlayers)
                 throw new DominoException($"Tried to start game with {players.Length} players, this is not allowed by current rules.");

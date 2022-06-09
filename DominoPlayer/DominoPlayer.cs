@@ -9,6 +9,9 @@ namespace DominoPlayer
         protected DominoGame GameReference { get; }
 
         protected List<Piece> Hand { get; }
+
+        protected Dictionary<int, List<double>> valuesPartnerNotHave = new Dictionary<int, List<double>>();
+        protected Dictionary<int, List<double>> valuesOpponentNothave = new Dictionary<int, List<double>>();
         public int Count { get { return Hand.Count; } }
         public DominoPlayer(int playerID, DominoGame game)
         => (PlayerID, GameReference, Hand) = (playerID, game, new List<Piece>());
@@ -26,6 +29,20 @@ namespace DominoPlayer
         {
             Hand.Clear();
             Hand.AddRange(startingHand);
+        }
+        public void SetPartners(params int[] partnersID)
+        {
+            foreach (var ID in partnersID)
+            {
+                valuesPartnerNotHave.Add(ID, new List<double>());
+            }
+        }
+        public void SetOpponents(params int[] opponentsID)
+        {
+            foreach (var ID in opponentsID)
+            {
+                valuesOpponentNothave.Add(ID, new List<double>());
+            }
         }
     }
 }
