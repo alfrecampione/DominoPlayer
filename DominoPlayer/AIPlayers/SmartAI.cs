@@ -124,6 +124,7 @@ namespace DominoPlayer.AI
                         if (smartPieces[j].Left == leftPiece.Left || leftPiece.Left == -1)
                         {
                             pieceToPlay = smartPieces[j];
+                            pieceToPlay.Reverse();
                             placedOnRight = false;
                             break;
                         }
@@ -145,6 +146,7 @@ namespace DominoPlayer.AI
                         if (smartPieces[j].Right == rightPiece.Right)
                         {
                             pieceToPlay = smartPieces[j];
+                            pieceToPlay.Reverse();
                             placedOnRight = true;
                             break;
                         }

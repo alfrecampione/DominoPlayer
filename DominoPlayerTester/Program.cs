@@ -95,24 +95,18 @@ public class Program
         DominoPlayer smartAI_2 = new SmartAI(2, game);
         DominoPlayer smartAI_3 = new SmartAI(3, game);
 
-        smartAI_0.SetOpponents(2, 3);
-        smartAI_1.SetOpponents(2, 3);
-        smartAI_2.SetOpponents(0, 1);
-        smartAI_3.SetOpponents(0, 1);
-
-        smartAI_0.SetPartners(1);
-        smartAI_1.SetPartners(0);
-        smartAI_2.SetPartners(3);
-        smartAI_3.SetPartners(2);
+        smartAI_0.SetOpponents(1);
+        smartAI_1.SetOpponents(0);
 
 
-        game.StartGame(smartAI_0, smartAI_1, smartAI_2, smartAI_3);
+        game.StartGame(smartAI_0, smartAI_1);
 
         while (true)
         {
             game.NextTurn();
 
-            Thread.Sleep(TURNS_PAUSE);
+            Console.ReadLine();
+            //Thread.Sleep(TURNS_PAUSE);
 
             if (game.IsGameOver(out int winner))
             {
@@ -156,7 +150,7 @@ public class Program
         {
             if (player is not AIPlayer ai) continue;
 
-            System.Console.WriteLine($"Player{player.PlayerID}'s Hand:");
+            System.Console.WriteLine($"Player {player.PlayerID} Hand:");
             foreach (var piece in ai.GetHand())
             {
                 Console.Write(PaintPiece(piece));
