@@ -39,6 +39,7 @@ namespace DominoPlayer
         }
         public void SetPartners(params int[] partnersID)
         {
+            valuesPartnerNotHave.Clear();
             foreach (var ID in partnersID)
             {
                 valuesPartnerNotHave.Add(ID, new List<double>());
@@ -46,6 +47,7 @@ namespace DominoPlayer
         }
         public void SetOpponents(params int[] opponentsID)
         {
+            valuesOpponentNothave.Clear();
             foreach (var ID in opponentsID)
             {
                 valuesOpponentNothave.Add(ID, new List<double>());
