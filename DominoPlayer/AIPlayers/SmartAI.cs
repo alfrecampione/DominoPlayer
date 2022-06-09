@@ -21,33 +21,32 @@ namespace DominoPlayer.AI
         }
         private void WatchMoves(Move move)
         {
-            //try
-            //{
-            if (move.playerID == PlayerID)
-                return;
-            if (move.passed)
+            try
             {
-                if (valuesPartnerNotHave.ContainsKey(move.playerID))
+                if (move.playerID == PlayerID)
+                    return;
+                if (move.passed)
                 {
-                    if (move.placedOnRight)
-                        valuesPartnerNotHave[move.playerID].Add(GameReference.history[GameReference.history.Count - 2].piecePlaced.Right);
+                    if (valuesPartnerNotHave.ContainsKey(move.playerID))
+                    {
+                        if (move.placedOnRight)
+                            valuesPartnerNotHave[move.playerID].Add(GameReference.GetPieceOnExtreme(true).Right);
+                        else
+                            valuesPartnerNotHave[move.playerID].Add(GameReference.GetPieceOnExtreme(false).Left);
+                    }
                     else
-                        valuesPartnerNotHave[move.playerID].Add(GameReference.history[GameReference.history.Count - 2].piecePlaced.Left);
-                }
-                else
-                {
-                    if (move.placedOnRight)
-                        valuesOpponentNothave[move.playerID].Add(GameReference.history[GameReference.history.Count - 2].piecePlaced.Right);
-                    else
-                        valuesOpponentNothave[move.playerID].Add(GameReference.history[GameReference.history.Count - 2].piecePlaced.Left);
+                    {
+                        if (move.placedOnRight)
+                            valuesOpponentNothave[move.playerID].Add(GameReference.GetPieceOnExtreme(true).Right);
+                        else
+                            valuesOpponentNothave[move.playerID].Add(GameReference.GetPieceOnExtreme(false).Left);
+                    }
                 }
             }
-            //}
-            //catch (KeyNotFoundException e)
-            //{
-            //  var temp = e;
-            //throw new DominoException("Not all players are in this player database");
-            //}
+            catch (KeyNotFoundException)
+            {
+                throw new DominoException("Not all players are in this player database");
+            }
         }
         protected override Move InternalGetMove()
         {
