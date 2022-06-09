@@ -11,43 +11,43 @@ namespace DominoPlayer.AI
         private const double TEAM_MISSING = 0.15;
         private const double OPPONENT_MISSING = 0.25;
         private const double SAME_NUMBER = 0.20;
+        private const double OPPONENT_PLACED = 0.20;
         private const double DOUBLE = 1.0;
 
         public SmartAI(int playerID, DominoGame game) :
         base(playerID, game)
         {
-            this.valuesPartnerNotHave = new Dictionary<int, List<double>>();
-            this.valuesOpponentNothave = new Dictionary<int, List<double>>();
             game.OnMoveMade += WatchMoves;
         }
         private void WatchMoves(Move move)
         {
-            try
+            //try
+            //{
+            if (move.playerID == PlayerID)
+                return;
+            if (move.passed)
             {
-                if (move.playerID == PlayerID)
-                    return;
-                if (move.passed)
+                if (valuesPartnerNotHave.ContainsKey(move.playerID))
                 {
-                    if (valuesPartnerNotHave.ContainsKey(move.playerID))
-                    {
-                        if (move.placedOnRight)
-                            valuesPartnerNotHave[move.playerID].Add(GameReference.history[GameReference.history.Count - 2].piecePlaced.Right);
-                        else
-                            valuesPartnerNotHave[move.playerID].Add(GameReference.history[GameReference.history.Count - 2].piecePlaced.Left);
-                    }
+                    if (move.placedOnRight)
+                        valuesPartnerNotHave[move.playerID].Add(GameReference.history[GameReference.history.Count - 2].piecePlaced.Right);
                     else
-                    {
-                        if (move.placedOnRight)
-                            valuesOpponentNothave[move.playerID].Add(GameReference.history[GameReference.history.Count - 2].piecePlaced.Right);
-                        else
-                            valuesOpponentNothave[move.playerID].Add(GameReference.history[GameReference.history.Count - 2].piecePlaced.Left);
-                    }
+                        valuesPartnerNotHave[move.playerID].Add(GameReference.history[GameReference.history.Count - 2].piecePlaced.Left);
+                }
+                else
+                {
+                    if (move.placedOnRight)
+                        valuesOpponentNothave[move.playerID].Add(GameReference.history[GameReference.history.Count - 2].piecePlaced.Right);
+                    else
+                        valuesOpponentNothave[move.playerID].Add(GameReference.history[GameReference.history.Count - 2].piecePlaced.Left);
                 }
             }
-            catch (KeyNotFoundException)
-            {
-                throw new DominoException("Not all players are in this player database");
-            }
+            //}
+            //catch (KeyNotFoundException e)
+            //{
+            //  var temp = e;
+            //throw new DominoException("Not all players are in this player database");
+            //}
         }
         protected override Move InternalGetMove()
         {
@@ -90,7 +90,7 @@ namespace DominoPlayer.AI
                 }
             }
             PointsForTeamMate(smartPieces, valuesPartner, pieceValues);
-            PointsForOponnent(smartPieces, valuesOpponent, pieceValues);
+            PointsForOpponnent(smartPieces, valuesOpponent, pieceValues);
             PointForDouble(smartPieces, pieceValues);
             PointForSameNumber(smartPieces, pieceValues);
             //Finish assigning
@@ -156,7 +156,7 @@ namespace DominoPlayer.AI
             return Move.CreateMove(PlayerID, pieceToPlay, placedOnRight);
         }
 
-        static void PointsForTeamMate(List<Piece> Hand, List<double> valuesPartnerNotHave, double[][] pieceValues)
+        void PointsForTeamMate(List<Piece> Hand, List<double> valuesPartnerNotHave, double[][] pieceValues)
         {
             for (int i = 0; i < valuesPartnerNotHave.Count; i++)
             {
@@ -169,7 +169,7 @@ namespace DominoPlayer.AI
                 }
             }
         }
-        static void PointsForOponnent(List<Piece> Hand, List<double> valuesOpponentNothave, double[][] pieceValues)
+        void PointsForOpponnent(List<Piece> Hand, List<double> valuesOpponentNothave, double[][] pieceValues)
         {
             for (int i = 0; i < valuesOpponentNothave.Count; i++)
             {
@@ -182,7 +182,7 @@ namespace DominoPlayer.AI
                 }
             }
         }
-        static void PointForSameNumber(List<Piece> Hand, double[][] pieceValues)
+        void PointForSameNumber(List<Piece> Hand, double[][] pieceValues)
         {
             Dictionary<double, int> dict = new Dictionary<double, int>();
             foreach (var piece in Hand)
@@ -213,7 +213,7 @@ namespace DominoPlayer.AI
                 pieceValues[i][0] += dict[keys[index]] * SAME_NUMBER;
             }
         }
-        static void PointForDouble(List<Piece> Hand, double[][] pieceValues)
+        void PointForDouble(List<Piece> Hand, double[][] pieceValues)
         {
             for (int i = 0; i < Hand.Count; i++)
             {
@@ -222,6 +222,16 @@ namespace DominoPlayer.AI
                     pieceValues[i][0] += DOUBLE;
                     pieceValues[i][1] += DOUBLE;
                 }
+            }
+        }
+        void PointForPlaced(List<Piece> Hand, double[][] pieceValues)
+        {
+            for (int i = 0; i < Hand.Count; i++)
+            {
+                if (Hand[i].Left == GameReference.history[GameReference.leftExtreme].piecePlaced.Left || Hand[i].Left == GameReference.history[GameReference.rightExtreme].piecePlaced.Right)
+                    pieceValues[i][0] += OPPONENT_PLACED;
+                if (Hand[i].Right == GameReference.history[GameReference.leftExtreme].piecePlaced.Left || Hand[i].Right == GameReference.history[GameReference.rightExtreme].piecePlaced.Right)
+                    pieceValues[i][1] += OPPONENT_PLACED;
             }
         }
     }

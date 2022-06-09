@@ -10,11 +10,18 @@ namespace DominoPlayer
 
         protected List<Piece> Hand { get; }
 
-        protected Dictionary<int, List<double>> valuesPartnerNotHave = new Dictionary<int, List<double>>();
-        protected Dictionary<int, List<double>> valuesOpponentNothave = new Dictionary<int, List<double>>();
+        protected Dictionary<int, List<double>> valuesPartnerNotHave;
+        protected Dictionary<int, List<double>> valuesOpponentNothave;
         public int Count { get { return Hand.Count; } }
         public DominoPlayer(int playerID, DominoGame game)
-        => (PlayerID, GameReference, Hand) = (playerID, game, new List<Piece>());
+        {
+            this.PlayerID = playerID;
+            this.GameReference = game;
+            this.Hand = new List<Piece>();
+            this.valuesOpponentNothave = new Dictionary<int, List<double>>();
+            this.valuesPartnerNotHave = new Dictionary<int, List<double>>();
+        }
+        //=> (PlayerID, GameReference, Hand) = (playerID, game, new List<Piece>());
         public double GetPlayerScore() => GameReference.gameRules.GetHandScore(GameReference, Hand);
         public Move GetMove()
         {

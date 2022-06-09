@@ -9,8 +9,8 @@ namespace DominoPlayer
         public int PiecesInGame => history.Count;
         public int CurrentPlayer { get; private set; }
 
-        private int leftExtreme;
-        private int rightExtreme;
+        public int leftExtreme;
+        public int rightExtreme;
 
         public List<DominoPlayer> Players => players;
 
