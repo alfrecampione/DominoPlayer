@@ -4,7 +4,7 @@ using System.Linq;
 namespace DominoPlayer
 {
     public abstract class DominoPlayer
-    {
+    {//test
         public int PlayerID { get; }
         protected DominoGame GameReference { get; }
 
