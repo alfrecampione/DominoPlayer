@@ -18,6 +18,7 @@
             reversed = false;
             gameRules = rules;
         }
+
         public void Reverse()
         {
             reversed = !reversed;
@@ -48,10 +49,12 @@
 
             return this == p;
         }
+
         public override int GetHashCode()
         {
             return base.GetHashCode();
         }
+
         public static bool operator ==(Piece a, Piece b)
         {
             static bool eq(Piece l, Piece r) => l.Left == r.Left && l.Right == r.Right;
