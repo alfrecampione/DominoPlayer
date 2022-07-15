@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System;
+﻿using System;
+using System.Collections.Generic;
 
 namespace DominoPlayer
 {
@@ -32,9 +31,10 @@ namespace DominoPlayer
             players = new List<DominoPlayer>(rules.MaxPlayers);
 
             for (int i = 0; i <= rules.MaxPieceValue; i++)
-                for (int e = i; e <= rules.MaxPieceValue; e++)
-                    undistributedPieces.Add(new Piece(i, e, rules));
+            for (int e = i; e <= rules.MaxPieceValue; e++)
+                undistributedPieces.Add(new Piece(i, e, rules));
         }
+
         private List<Piece> CreateHand()
         {
             Random random = new Random();
@@ -49,12 +49,15 @@ namespace DominoPlayer
                 hand.Add(undistributedPieces[index]);
                 undistributedPieces.RemoveAt(index);
             }
+
             return hand;
         }
+
         public void StartGame(params DominoPlayer[] players)
         {
             if (players.Length > gameRules.MaxPlayers || players.Length < gameRules.MinPlayers)
-                throw new DominoException($"Tried to start game with {players.Length} players, this is not allowed by current rules.");
+                throw new DominoException(
+                    $"Tried to start game with {players.Length} players, this is not allowed by current rules.");
 
             this.players.Clear();
             this.players.AddRange(players);
@@ -69,7 +72,8 @@ namespace DominoPlayer
             => gameRules.GameOverCondition(this, out winner);
 
 
-        public IEnumerable<(Piece piece, bool canMatchLeft, bool canMatchRight, bool reverseLeft, bool reverseRight)> GetPlayablePieces(IEnumerable<Piece> hand)
+        public IEnumerable<(Piece piece, bool canMatchLeft, bool canMatchRight, bool reverseLeft, bool reverseRight)>
+            GetPlayablePieces(IEnumerable<Piece> hand)
         {
             (Piece leftPiece, Piece rightPiece) =
             (
@@ -93,7 +97,8 @@ namespace DominoPlayer
                 }
             }
         }
-        public void MakeMove(Move move)
+
+        private void MakeMove(Move move)
         {
             history.Add(move);
             if (!move.passed)
@@ -103,19 +108,21 @@ namespace DominoPlayer
                 else
                     leftExtreme = history.Count - 1;
             }
+
             OnMoveMade?.Invoke(move);
         }
+
         public void NextTurn()
         {
             if (players is null)
                 throw new DominoException("Tried to call NextTurn but game has not started yet.");
-
             MakeMove(players[CurrentPlayer].GetMove());
             CurrentPlayer++;
 
             if (CurrentPlayer >= players.Count)
                 CurrentPlayer = 0;
         }
+
         public Piece GetPieceOnExtreme(bool right)
         {
             if (history.Count == 0)

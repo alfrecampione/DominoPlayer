@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
+// ReSharper disable MemberCanBePrivate.Global
+
 // ReSharper disable CompareOfFloatsByEqualityOperator
 
 // ReSharper disable CheckNamespace
@@ -12,12 +14,11 @@ namespace DominoPlayer.AI
 {
     public class SmartAI : AIPlayer
     {
-        //This can't be readonly, it need to be changed in the middle of the game
-        private const double TeamMissing = 0.15;
-        private const double OpponentMissing = 0.25;
-        private const double SameNumber = 0.20;
-        private const double OpponentPlaced = 0.20;
-        private const double Double = 1.0;
+        public const double TeamMissing = 0.15;
+        public const double OpponentMissing = 0.25;
+        public const double SameNumber = 0.20;
+        public const double OpponentPlaced = 0.20;
+        public const double Double = 1.0;
 
         public SmartAI(int playerID, DominoGame game) :
             base(playerID, game)
@@ -98,11 +99,11 @@ namespace DominoPlayer.AI
                 }
             }
 
-            PointsForTeamMate(smartPieces, valuesPartner, pieceValues);
-            PointsForOpponnent(smartPieces, valuesOpponent, pieceValues);
+            PointsForTeamMate(smartPieces, valuesPartner, pieceValues, GameReference);
+            PointsForOpponnent(smartPieces, valuesOpponent, pieceValues, GameReference);
             PointForDouble(smartPieces, pieceValues);
             PointForSameNumber(smartPieces, pieceValues);
-            PointForPlaced(smartPieces, pieceValues);
+            PointForPlaced(smartPieces, pieceValues, GameReference, GetOpponents());
             //Finish assigning
             //------------------------
 
@@ -123,50 +124,41 @@ namespace DominoPlayer.AI
             bool placedOnRight = default;
 
             //Check the side to put the piece with the highest side value
-            for (int i = 0; i < sortedValues.Count; i++)
+            foreach (var t in sortedValues.TakeWhile(t => pieceToPlay.Left == -1))
             {
-                if (pieceToPlay.Left != -1)
-                    break;
                 for (int j = 0; j < pieceValues.Length; j++)
                 {
-                    if (sortedValues[i] == pieceValues[j][0] || sortedValues[i] == pieceValues[j][1])
+                    if (t != pieceValues[j][0] && t != pieceValues[j][1]) continue;
+                    if (leftPiece.CanMatch(smartPieces[j], false, out var reversed) || leftPiece.Left == -1)
                     {
-                        bool reversed = false;
-                        if (leftPiece.CanMatch(smartPieces[j], false, out reversed) || leftPiece.Left == -1)
-                        {
-                            pieceToPlay = smartPieces[j];
-                            if (reversed)
-                                pieceToPlay.Reverse();
-                            placedOnRight = false;
-                            break;
-                        }
-
-                        if (rightPiece.CanMatch(smartPieces[j], true, out reversed))
-                        {
-                            pieceToPlay = smartPieces[j];
-                            if (reversed)
-                                pieceToPlay.Reverse();
-                            placedOnRight = true;
-                            break;
-                        }
+                        pieceToPlay = smartPieces[j];
+                        if (reversed)
+                            pieceToPlay.Reverse();
+                        placedOnRight = false;
+                        break;
                     }
+
+                    if (!rightPiece.CanMatch(smartPieces[j], true, out reversed)) continue;
+                    pieceToPlay = smartPieces[j];
+                    if (reversed)
+                        pieceToPlay.Reverse();
+                    placedOnRight = true;
+                    break;
                 }
             }
 
-            if (pieceToPlay.Left == -1)
-                throw new DominoException("No piece could be found to play");
             return Move.CreateMove(PlayerID, pieceToPlay, placedOnRight);
         }
 
-        void PointsForTeamMate(List<Piece> hand, List<int> valuesPartnerNotHave, double[][] pieceValues)
+        public static void PointsForTeamMate(List<Piece> hand, List<int> valuesPartnerNotHave, double[][] pieceValues,
+            DominoGame gameReference)
         {
-            for (int i = 0; i < valuesPartnerNotHave.Count; i++)
+            foreach (var t in valuesPartnerNotHave)
             {
                 for (int k = 0; k < hand.Count; k++)
                 {
-                    Piece p = new Piece(valuesPartnerNotHave[i], valuesPartnerNotHave[i], GameReference.gameRules);
-                    bool reversed = false;
-                    if (p.CanMatch(hand[k], true, out reversed))
+                    Piece p = new Piece(t, t, gameReference.gameRules);
+                    if (p.CanMatch(hand[k], true, out var reversed))
                     {
                         if (reversed)
                         {
@@ -179,29 +171,27 @@ namespace DominoPlayer.AI
             }
         }
 
-        void PointsForOpponnent(List<Piece> hand, List<int> valuesOpponentNothave, double[][] pieceValues)
+        public static void PointsForOpponnent(List<Piece> hand, List<int> valuesOpponentNothave, double[][] pieceValues,
+            DominoGame gameReference)
         {
-            for (int i = 0; i < valuesOpponentNothave.Count; i++)
+            foreach (var t in valuesOpponentNothave)
             {
                 for (int k = 0; k < hand.Count; k++)
                 {
-                    Piece p = new Piece(valuesOpponentNothave[i], valuesOpponentNothave[i], GameReference.gameRules);
+                    var p = new Piece(t, t, gameReference.gameRules);
 
-                    bool reversed = false;
-                    if (p.CanMatch(hand[k], true, out reversed))
+                    if (!p.CanMatch(hand[k], true, out var reversed)) continue;
+                    if (reversed)
                     {
-                        if (reversed)
-                        {
-                            pieceValues[k][0] += OpponentMissing;
-                        }
-                        else
-                            pieceValues[k][1] += OpponentMissing;
+                        pieceValues[k][0] += OpponentMissing;
                     }
+                    else
+                        pieceValues[k][1] += OpponentMissing;
                 }
             }
         }
 
-        void PointForSameNumber(List<Piece> hand, double[][] pieceValues)
+        public static void PointForSameNumber(List<Piece> hand, double[][] pieceValues)
         {
             Dictionary<double, int> dict = new Dictionary<double, int>();
             foreach (var piece in hand)
@@ -235,7 +225,7 @@ namespace DominoPlayer.AI
             }
         }
 
-        void PointForDouble(List<Piece> hand, double[][] pieceValues)
+        public static void PointForDouble(List<Piece> hand, double[][] pieceValues)
         {
             for (int i = 0; i < hand.Count; i++)
             {
@@ -247,15 +237,16 @@ namespace DominoPlayer.AI
             }
         }
 
-        void PointForPlaced(List<Piece> hand, double[][] pieceValues)
+        public static void PointForPlaced(List<Piece> hand, double[][] pieceValues, DominoGame gameReference,
+            List<int> opponents)
         {
-            if (GameReference.history.Count == 0)
+            if (gameReference.history.Count == 0)
                 return;
             for (int i = 0; i < hand.Count; i++)
             {
-                if (GetOpponents().Contains(GameReference.history[GameReference.leftExtreme].playerID))
+                if (opponents.Contains(gameReference.history[gameReference.leftExtreme].playerID))
                 {
-                    if (GameReference.history[GameReference.leftExtreme].piecePlaced
+                    if (gameReference.history[gameReference.leftExtreme].piecePlaced
                         .CanMatch(hand[i], false, out var reversed))
                     {
                         if (reversed)
@@ -265,9 +256,10 @@ namespace DominoPlayer.AI
                     }
                 }
 
-                if (GetOpponents().Contains(GameReference.history[GameReference.rightExtreme].playerID))
+                if (!opponents.Contains(gameReference.history[gameReference.rightExtreme].playerID)) continue;
                 {
-                    if (GameReference.history[GameReference.rightExtreme].piecePlaced.CanMatch(hand[i],true, out var reversed))
+                    if (gameReference.history[gameReference.rightExtreme].piecePlaced
+                        .CanMatch(hand[i], true, out var reversed))
                     {
                         if (reversed)
                             pieceValues[i][1] += OpponentPlaced;
