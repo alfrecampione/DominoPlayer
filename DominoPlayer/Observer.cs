@@ -15,23 +15,15 @@ namespace DominoPlayer
         private Dictionary<int, List<int>> _valuesPartnerNotHave = new Dictionary<int, List<int>>();
         private Dictionary<int, List<int>> _valuesOpponentNothave = new Dictionary<int, List<int>>();
 
-        private List<int> SetOpponents() => _game.Players[_id].GetOpponents();
-        private List<int> SetPartners() => _game.Players[_id].GetPartners();
+        private List<int> SetOpponents() => _game.Players.First(x=>x.PlayerID==_id).GetOpponents();
+        private List<int> SetPartners() => _game.Players.First(x=>x.PlayerID==_id).GetPartners();
 
         public Observer(int id, DominoGame dominoGame)
         {
             _id = id;
             _game = dominoGame;
-            foreach (var opponent in SetOpponents())
-            {
-                _valuesOpponentNothave.Add(opponent, new List<int>());
-            }
-
-            foreach (var partner in SetPartners())
-            {
-                _valuesPartnerNotHave.Add(partner, new List<int>());
-            }
-
+            SetOpponents().ForEach(x=>_valuesOpponentNothave.Add(x, new List<int>()));
+            SetPartners().ForEach(x=>_valuesPartnerNotHave.Add(x, new List<int>()));
             dominoGame.OnMoveMade += WatchMoves;
         }
 
@@ -70,7 +62,7 @@ namespace DominoPlayer
             var pieces = GetScores(hand);
             if (!pieces.Any())
                 return -1;
-            return 1 - (pieces.IndexOf(selectedPiece) / pieces.Count);
+            return 1 - ((double)pieces.IndexOf(selectedPiece) / (double)pieces.Count);
         }
 
         private List<Piece> GetScores(List<Piece> hand)
