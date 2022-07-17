@@ -1,12 +1,14 @@
-using System.Linq;
 using System;
+using System.Linq;
 
 namespace DominoPlayer.AI
 {
     public class BotaGordaAI : AIPlayer
     {
         public BotaGordaAI(int playerID, DominoGame game)
-        : base(playerID, game) { }
+            : base(playerID, game)
+        {
+        }
 
         protected override Move InternalGetMove()
         {
@@ -16,17 +18,33 @@ namespace DominoPlayer.AI
                 return Move.CreatePass(PlayerID);
 
             (Piece piece, bool canMatchLeft, bool canMatchRight, bool reverseLeft, bool reverseRight)
-            = possiblePieces.OrderByDescending(p => p.piece.Left + p.piece.Right).First();
-
-            if (canMatchRight && reverseRight || canMatchLeft && reverseLeft)
-                piece.Reverse();
-
+                = possiblePieces.OrderByDescending(p => p.piece.Left + p.piece.Right).First();
+            
             if (canMatchLeft && canMatchRight)
             {
-                bool right = new Random().Next(2) == 0;
-                return Move.CreateMove(PlayerID, piece, right);
+                Random rnd = new Random();
+                int side = rnd.Next(0, 2);
+                if (side == 0)
+                    canMatchRight = false;
+                if (side == 1)
+                    canMatchLeft = false;
             }
-            return Move.CreateMove(PlayerID, piece, canMatchRight);
+
+            if (canMatchLeft && reverseLeft)
+            {
+                piece.Reverse();
+                return Move.CreateMove(PlayerID, piece, false);
+            }
+
+            if (canMatchLeft)
+                return Move.CreateMove(PlayerID, piece, false);
+            if (canMatchRight && reverseRight)
+            {
+                piece.Reverse();
+                return Move.CreateMove(PlayerID, piece, true);
+            }
+            else
+                return Move.CreateMove(PlayerID, piece, true);
         }
     }
 }
