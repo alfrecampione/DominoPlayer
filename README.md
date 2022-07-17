@@ -1,1 +1,1 @@
-DLL de nuestro proyecto de programacion
+Para ejecutar el juego solamente tiene q descargar la ultima version de la aplicacion en este enlace: https://github.com/pixeldashgames/DominosNotPizza y ejecutar el .exe, en este repo se encuentra el dll con la logica del juego de domino
